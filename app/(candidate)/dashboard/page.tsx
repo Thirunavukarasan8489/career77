@@ -147,7 +147,7 @@ export default function CandidateDashboard() {
                       Uploaded Resume
                     </span>
                     <a
-                      href={candidate.resumeUrl}
+                      href={`/api/uploads/view?url=${encodeURIComponent(candidate.resumeUrl)}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-[10px] text-indigo-600 hover:underline block truncate font-semibold"

@@ -212,7 +212,7 @@ export default function ApplicantsPage() {
                     <td className="py-4 pr-4">
                       {app.candidateId?.resumeUrl ? (
                         <a
-                          href={app.candidateId.resumeUrl}
+                          href={`/api/uploads/view?url=${encodeURIComponent(app.candidateId.resumeUrl)}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-xs text-indigo-600 hover:underline font-bold"

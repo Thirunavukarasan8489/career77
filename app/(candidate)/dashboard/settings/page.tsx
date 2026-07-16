@@ -203,7 +203,7 @@ export default function CandidateSettingsPage() {
                 Current Resume
               </label>
               <a
-                href={candidate.resumeUrl}
+                href={`/api/uploads/view?url=${encodeURIComponent(candidate.resumeUrl)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-xs text-indigo-600 hover:underline font-bold inline-flex items-center gap-1"
