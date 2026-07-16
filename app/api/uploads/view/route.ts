@@ -12,12 +12,15 @@ export async function GET(request: Request) {
     const fileRes = await fetch(fileUrl);
     if (!fileRes.ok) {
       const errText = await fileRes.text().catch(() => "");
-      return new Response(`Failed to fetch file from storage: Status ${fileRes.status} (${fileRes.statusText}). Cloudinary response: ${errText}`, { status: 500 });
+      return new Response(
+        `Failed to fetch file from storage: Status ${fileRes.status} (${fileRes.statusText}). Cloudinary response: ${errText}`,
+        { status: 500 },
+      );
     }
 
     // Capture the original content type or default to PDF
     let contentType = fileRes.headers.get("content-type") || "application/pdf";
-    
+
     // Cloudinary raw uploads might return application/octet-stream. Override for PDFs
     if (fileUrl.toLowerCase().endsWith(".pdf")) {
       contentType = "application/pdf";
@@ -32,6 +35,8 @@ export async function GET(request: Request) {
       },
     });
   } catch (error: any) {
-    return new Response(error.message || "Failed to view file", { status: 500 });
+    return new Response(error.message || "Failed to view file", {
+      status: 500,
+    });
   }
 }
