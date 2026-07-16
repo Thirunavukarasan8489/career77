@@ -27,41 +27,29 @@ export default async function RecruiterDashboard() {
   );
 
   return (
-    <div className="grow bg-slate-50">
-      {/* DASH HEADER */}
-      <header className="bg-white border-b border-slate-200 py-10">
-        <div className="max-w-4xl mx-auto px-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-full bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center font-black text-xl font-display">
-              R
-            </div>
-            <div>
-              <h1 className="font-display font-black text-xl text-slate-900">
-                Recruiter Panel
-              </h1>
-              <p className="text-xs text-slate-500 font-semibold mt-0.5">
-                Logged in: <span className="text-blue-600">{session?.user?.email}</span>
-              </p>
-            </div>
-          </div>
-
-          <div className="flex gap-2">
-            <Link
-              href="/recruiter/post-job"
-              className="bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold px-5 py-2.5 rounded-full transition-all shadow-sm text-center"
-            >
-              + Post New Job
-            </Link>
-          </div>
+    <div className="space-y-6">
+      {/* HEADER */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-5 border-b border-slate-200">
+        <div>
+          <h1 className="font-display font-black text-2xl text-slate-900">
+            My Postings
+          </h1>
+          <p className="text-xs sm:text-sm font-semibold text-slate-500 mt-0.5">
+            Manage your active openings and review applicants.
+          </p>
         </div>
-      </header>
+        <div className="flex gap-2">
+          <Link
+            href="/recruiter/post-job"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-bold px-5 py-2.5 rounded-full transition-all shadow-sm text-center"
+          >
+            + Post New Job
+          </Link>
+        </div>
+      </div>
 
-      {/* MY POSTINGS */}
-      <main className="max-w-4xl mx-auto px-4 py-10">
-        <h2 className="font-display font-extrabold text-lg text-slate-900 mb-6">
-          My Postings
-        </h2>
-
+      {/* JOBS LIST */}
+      <div>
         {jobsWithCount.length > 0 ? (
           <div className="space-y-4">
             {jobsWithCount.map((job) => (
@@ -79,7 +67,7 @@ export default async function RecruiterDashboard() {
                 <div className="flex items-center gap-2 self-start sm:self-center">
                   <Link
                     href={`/recruiter/jobs/${job._id}/applicants`}
-                    className="border border-blue-600 text-blue-600 hover:bg-blue-50 text-xs font-bold px-4 py-2 rounded-full transition-colors inline-block text-center"
+                    className="border border-indigo-600 text-indigo-600 hover:bg-indigo-50 text-xs font-bold px-4 py-2 rounded-full transition-colors inline-block text-center"
                   >
                     View Applicants
                   </Link>
@@ -94,13 +82,13 @@ export default async function RecruiterDashboard() {
             <p className="text-sm text-slate-400 mt-1">Get started by creating your first job listing.</p>
             <Link
               href="/recruiter/post-job"
-              className="text-xs font-bold text-blue-600 hover:underline mt-2 inline-block"
+              className="text-xs font-bold text-indigo-600 hover:underline mt-2 inline-block"
             >
               Post a job now &rarr;
             </Link>
           </div>
         )}
-      </main>
+      </div>
     </div>
   );
 }

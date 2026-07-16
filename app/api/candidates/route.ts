@@ -129,15 +129,33 @@ export async function PATCH(request: Request) {
     }
 
     const body = await request.json().catch(() => ({}));
-    const { lookingFor } = body;
+    const { name, email, experience, city, skills, lookingFor } = body;
 
-    if (!lookingFor) {
-      return NextResponse.json({ error: "Missing lookingFor value" }, { status: 400 });
+    const updateData: any = {};
+    if (name !== undefined) updateData.name = name.trim();
+    if (email !== undefined) updateData.email = email.trim();
+    if (experience !== undefined) updateData.experience = experience.trim();
+    if (city !== undefined) updateData.city = city.trim();
+    if (lookingFor !== undefined) updateData.lookingFor = lookingFor.trim();
+
+    if (skills !== undefined) {
+      if (Array.isArray(skills)) {
+        updateData.skills = skills;
+      } else if (typeof skills === "string") {
+        updateData.skills = skills
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean);
+      }
+    }
+
+    if (Object.keys(updateData).length === 0) {
+      return NextResponse.json({ error: "No fields to update provided" }, { status: 400 });
     }
 
     const candidate = await Candidate.findByIdAndUpdate(
       session.candidateId,
-      { lookingFor },
+      updateData,
       { new: true }
     );
 

@@ -135,7 +135,7 @@ export default function ApplicantsPage() {
   if (loading) {
     return (
       <div className="flex justify-center items-center py-20 grow">
-        <div className="w-10 h-10 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+        <div className="w-10 h-10 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
       </div>
     );
   }
@@ -144,8 +144,8 @@ export default function ApplicantsPage() {
     return (
       <div className="max-w-xl mx-auto py-20 text-center grow">
         <p className="text-slate-500 font-semibold">Job listing not found.</p>
-        <Link href="/recruiter" className="text-blue-600 hover:underline mt-2 inline-block">
-          Return to Recruiter Panel
+        <Link href="/recruiter" className="text-indigo-600 hover:underline mt-2 inline-block">
+          Return to Dashboard
         </Link>
       </div>
     );
@@ -158,18 +158,18 @@ export default function ApplicantsPage() {
   );
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-10 grow w-full">
+    <div className="space-y-6">
       <div className="mb-6">
         <Link
           href="/recruiter"
-          className="text-xs sm:text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors inline-flex items-center gap-1"
+          className="text-xs sm:text-sm font-semibold text-indigo-600 hover:text-indigo-700 transition-colors inline-flex items-center gap-1"
         >
-          &larr; Back to Panel
+          &larr; Back to Dashboard
         </Link>
       </div>
 
       <h1 className="font-display font-extrabold text-2xl text-slate-900 mb-8">
-        Applicants &mdash; <span className="text-blue-600">{job.title}</span>
+        Applicants &mdash; <span className="text-indigo-600">{job.title}</span>
       </h1>
 
       {/* APPLICANTS TABLE */}
@@ -215,7 +215,7 @@ export default function ApplicantsPage() {
                           href={app.candidateId.resumeUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-xs text-blue-600 hover:underline font-bold"
+                          className="text-xs text-indigo-600 hover:underline font-bold"
                         >
                           View Resume &rarr;
                         </a>
@@ -227,7 +227,7 @@ export default function ApplicantsPage() {
                       <select
                         value={app.status}
                         onChange={(e) => handleUpdateStatus(app.candidateId._id, e.target.value)}
-                        className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-colors cursor-pointer"
+                        className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-700 outline-none focus:border-indigo-500 focus:bg-white transition-colors cursor-pointer"
                       >
                         <option value="Applied">Applied</option>
                         <option value="Shortlisted">Shortlisted</option>
@@ -275,7 +275,7 @@ export default function ApplicantsPage() {
                     <td className="py-4 pr-4 font-bold text-slate-800">
                       {cand.name}
                     </td>
-                    <td className="py-4 pr-4 font-semibold text-blue-600 text-xs">
+                    <td className="py-4 pr-4 font-semibold text-indigo-600 text-xs">
                       {cand.lookingFor}
                     </td>
                     <td className="py-4 pr-4 font-medium text-slate-500 text-xs">

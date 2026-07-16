@@ -79,16 +79,20 @@ export default function QuickApplyModal({ job, isOpen, onClose }: QuickApplyModa
       formData.append("signature", sigData.signature);
       formData.append("folder", sigData.folder);
 
-      // We upload as 'raw' or 'auto' depending on type. For PDFs, raw or image work.
+      // We upload as 'raw' to avoid PDF delivery restrictions on new Cloudinary accounts.
       // Cloudinary raw upload url:
-      const uploadUrl = `https://api.cloudinary.com/v1_1/${sigData.cloudName}/auto/upload`;
+      const uploadUrl = `https://api.cloudinary.com/v1_1/${sigData.cloudName}/raw/upload`;
+      // const uploadUrl = `https://api.cloudinary.com/v1_1/${sigData.cloudName}/auto/upload`;
 
       const uploadRes = await fetch(uploadUrl, {
         method: "POST",
         body: formData,
       });
 
-      if (!uploadRes.ok) throw new Error("Upload to Cloudinary failed");
+      if (!uploadRes.ok) {
+        const errData = await uploadRes.json().catch(() => ({}));
+        throw new Error(errData?.error?.message || "Upload resume failed");
+      }
       const uploadData = await uploadRes.json();
 
       setResumeUrl(uploadData.secure_url);
@@ -106,7 +110,7 @@ export default function QuickApplyModal({ job, isOpen, onClose }: QuickApplyModa
   const handleWhatsAppApply = () => {
     const defaultWhatsApp = "919999999999";
     const whatsappNum = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || defaultWhatsApp;
-    
+
     const introName = name ? ` — my name is ${name}` : "";
     const text = `Hi, I'd like to apply for the ${job.title} position (${job.location})${introName}.`;
     const url = `https://wa.me/${whatsappNum}?text=${encodeURIComponent(text)}`;
@@ -227,11 +231,10 @@ export default function QuickApplyModal({ job, isOpen, onClose }: QuickApplyModa
               Upload Resume
             </label>
             <div
-              className={`border-2 border-dashed rounded-xl p-5 text-center cursor-pointer transition-colors ${
-                file
-                  ? "border-emerald-500 bg-emerald-50/30"
-                  : "border-slate-300 hover:border-blue-500 bg-slate-50 hover:bg-slate-100/50"
-              }`}
+              className={`border-2 border-dashed rounded-xl p-5 text-center cursor-pointer transition-colors ${file
+                ? "border-emerald-500 bg-emerald-50/30"
+                : "border-slate-300 hover:border-blue-500 bg-slate-50 hover:bg-slate-100/50"
+                }`}
               onClick={() => document.getElementById("apply-file")?.click()}
             >
               <span className="block text-2xl mb-1">{file ? "📄" : "📤"}</span>

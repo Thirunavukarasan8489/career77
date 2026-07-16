@@ -47,11 +47,11 @@ export default function NotificationsPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-10 grow w-full">
+    <div className="space-y-6">
       <div className="mb-6">
         <Link
           href="/dashboard"
-          className="text-xs sm:text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors inline-flex items-center gap-1"
+          className="text-xs sm:text-sm font-semibold text-indigo-600 hover:text-indigo-700 transition-colors inline-flex items-center gap-1"
         >
           &larr; Back to Dashboard
         </Link>
@@ -64,13 +64,13 @@ export default function NotificationsPage() {
       <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
         {loading ? (
           <div className="flex justify-center py-10">
-            <div className="w-6 h-6 border-2 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+            <div className="w-6 h-6 border-2 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
           </div>
         ) : notifications.length > 0 ? (
           <div className="divide-y divide-slate-100">
             {notifications.map((notif) => (
               <div key={notif._id} className="flex gap-4 py-4 first:pt-0 last:pb-0">
-                <div className="w-10 h-10 rounded-full bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center text-lg flex-shrink-0">
+                <div className="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 border border-indigo-100 flex items-center justify-center text-lg flex-shrink-0">
                   🎯
                 </div>
                 <div className="grow">
@@ -82,7 +82,7 @@ export default function NotificationsPage() {
                   </p>
                 </div>
                 {!notif.read && (
-                  <div className="w-2.5 h-2.5 bg-blue-600 rounded-full self-center flex-shrink-0 animate-pulse" />
+                  <div className="w-2.5 h-2.5 bg-indigo-600 rounded-full self-center flex-shrink-0 animate-pulse" />
                 )}
               </div>
             ))}

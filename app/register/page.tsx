@@ -84,13 +84,16 @@ export default function RegisterPage() {
       formData.append("signature", sigData.signature);
       formData.append("folder", sigData.folder);
 
-      const uploadUrl = `https://api.cloudinary.com/v1_1/${sigData.cloudName}/auto/upload`;
+      const uploadUrl = `https://api.cloudinary.com/v1_1/${sigData.cloudName}/raw/upload`;
       const uploadRes = await fetch(uploadUrl, {
         method: "POST",
         body: formData,
       });
 
-      if (!uploadRes.ok) throw new Error("Cloudinary upload failed");
+      if (!uploadRes.ok) {
+        const errData = await uploadRes.json().catch(() => ({}));
+        throw new Error(errData?.error?.message || "Cloudinary upload failed");
+      }
       const uploadData = await uploadRes.json();
 
       setResumeUrl(uploadData.secure_url);

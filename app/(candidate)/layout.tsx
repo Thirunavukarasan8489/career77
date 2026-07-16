@@ -1,4 +1,5 @@
 import React from "react";
+import CandidateLayoutClient from "@/components/CandidateLayoutClient";
 
 // Block all candidate dashboard pages from crawlers (Section 5)
 export const metadata = {
@@ -10,5 +11,9 @@ export default function CandidateLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return (
+    <CandidateLayoutClient>
+      {children}
+    </CandidateLayoutClient>
+  );
 }

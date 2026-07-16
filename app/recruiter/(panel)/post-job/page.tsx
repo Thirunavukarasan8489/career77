@@ -52,13 +52,13 @@ export default function PostJobPage() {
   };
 
   return (
-    <div className="max-w-xl mx-auto px-4 py-10 grow w-full">
+    <div className="max-w-xl mx-auto py-6 w-full">
       <div className="mb-6">
         <Link
           href="/recruiter"
-          className="text-xs sm:text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors inline-flex items-center gap-1"
+          className="text-xs sm:text-sm font-semibold text-indigo-600 hover:text-indigo-700 transition-colors inline-flex items-center gap-1"
         >
-          &larr; Back to Recruiter Panel
+          &larr; Back to Dashboard
         </Link>
       </div>
 
@@ -83,7 +83,7 @@ export default function PostJobPage() {
               placeholder="e.g. Senior Backend Engineer"
               value={form.title}
               onChange={(e) => setForm({ ...form, title: e.target.value })}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-blue-500 focus:bg-white transition-all"
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-indigo-500 focus:bg-white transition-all"
             />
           </div>
 
@@ -98,7 +98,7 @@ export default function PostJobPage() {
                 placeholder="e.g. Jaipur / Remote"
                 value={form.location}
                 onChange={(e) => setForm({ ...form, location: e.target.value })}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-blue-500 focus:bg-white transition-all"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-indigo-500 focus:bg-white transition-all"
               />
             </div>
             <div>
@@ -110,7 +110,7 @@ export default function PostJobPage() {
                 placeholder="e.g. 2-4 years"
                 value={form.experience}
                 onChange={(e) => setForm({ ...form, experience: e.target.value })}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-blue-500 focus:bg-white transition-all"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-indigo-500 focus:bg-white transition-all"
               />
             </div>
           </div>
@@ -124,7 +124,7 @@ export default function PostJobPage() {
               placeholder="e.g. Java, Spring Boot, PostgreSQL"
               value={form.skills}
               onChange={(e) => setForm({ ...form, skills: e.target.value })}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-blue-500 focus:bg-white transition-all"
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-indigo-500 focus:bg-white transition-all"
             />
           </div>
 
@@ -137,14 +137,14 @@ export default function PostJobPage() {
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
               rows={5}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-blue-500 focus:bg-white transition-all resize-none"
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-indigo-500 focus:bg-white transition-all resize-none"
             />
           </div>
 
           <button
             type="submit"
             disabled={submitting}
-            className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white py-3.5 rounded-xl font-bold transition-all shadow-md mt-6 cursor-pointer"
+            className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-300 text-white py-3.5 rounded-xl font-bold transition-all shadow-md mt-6 cursor-pointer"
           >
             {submitting ? "Publishing Job..." : "Publish Opening"}
           </button>

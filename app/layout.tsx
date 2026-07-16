@@ -3,9 +3,7 @@ import { Inter, Outfit } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
 import { AppProvider } from "@/context/AppContext";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import Toast from "@/components/Toast";
+import LayoutWrapper from "@/components/LayoutWrapper";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -37,10 +35,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-slate-50 text-slate-900 font-sans">
         <Providers>
           <AppProvider>
-            <Navbar />
-            <main className="flex flex-col grow">{children}</main>
-            <Footer />
-            <Toast />
+            <LayoutWrapper>{children}</LayoutWrapper>
           </AppProvider>
         </Providers>
       </body>
