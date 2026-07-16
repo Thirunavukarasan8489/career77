@@ -1,0 +1,155 @@
+import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { connectToDatabase } from "@/lib/db";
+import { Candidate } from "@/models/Candidate";
+import { signCandidateSession, verifyCandidateSession } from "@/lib/auth";
+
+export async function POST(request: Request) {
+  try {
+    await connectToDatabase();
+    const body = await request.json().catch(() => ({}));
+    const {
+      name,
+      mobile,
+      email,
+      experience,
+      city,
+      skills,
+      lookingFor,
+      resumeUrl,
+      resumePublicId,
+    } = body;
+
+    if (!name || !mobile || !lookingFor) {
+      return NextResponse.json(
+        { error: "Missing required fields (name, mobile, lookingFor)" },
+        { status: 400 }
+      );
+    }
+
+    // Check duplicate
+    const existing = await Candidate.findOne({ mobile });
+    if (existing) {
+      return NextResponse.json(
+        { error: "This mobile number is already registered" },
+        { status: 409 }
+      );
+    }
+
+    // Parse skills
+    let skillsArray: string[] = [];
+    if (Array.isArray(skills)) {
+      skillsArray = skills;
+    } else if (typeof skills === "string") {
+      skillsArray = skills
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
+    }
+
+    const candidate = await Candidate.create({
+      name,
+      mobile,
+      email,
+      experience,
+      city,
+      skills: skillsArray,
+      lookingFor,
+      resumeUrl,
+      resumePublicId,
+    });
+
+    const sessionPayload = {
+      candidateId: candidate._id.toString(),
+      mobile: candidate.mobile,
+      name: candidate.name,
+    };
+    const sessionToken = signCandidateSession(sessionPayload);
+
+    const response = NextResponse.json({ success: true, candidate });
+    const cookieStore = await cookies();
+    cookieStore.set("candidate_session", sessionToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 30 * 24 * 60 * 60, // 30 days
+      path: "/",
+    });
+
+    return response;
+  } catch (error: any) {
+    return NextResponse.json(
+      { error: error.message || "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function GET() {
+  try {
+    await connectToDatabase();
+    const cookieStore = await cookies();
+    const token = cookieStore.get("candidate_session")?.value;
+    const session = token ? verifyCandidateSession(token) : null;
+
+    if (session) {
+      const candidate = await Candidate.findById(session.candidateId);
+      if (!candidate) {
+        return NextResponse.json({ error: "Candidate not found" }, { status: 404 });
+      }
+      return NextResponse.json({ candidate });
+    }
+
+    // Check recruiter session
+    const recSession = await getServerSession(authOptions);
+    if (recSession && recSession.user) {
+      const candidates = await Candidate.find({});
+      return NextResponse.json({ candidates });
+    }
+
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  } catch (error: any) {
+    return NextResponse.json(
+      { error: error.message || "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PATCH(request: Request) {
+  try {
+    await connectToDatabase();
+    const cookieStore = await cookies();
+    const token = cookieStore.get("candidate_session")?.value;
+    const session = token ? verifyCandidateSession(token) : null;
+
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const body = await request.json().catch(() => ({}));
+    const { lookingFor } = body;
+
+    if (!lookingFor) {
+      return NextResponse.json({ error: "Missing lookingFor value" }, { status: 400 });
+    }
+
+    const candidate = await Candidate.findByIdAndUpdate(
+      session.candidateId,
+      { lookingFor },
+      { new: true }
+    );
+
+    if (!candidate) {
+      return NextResponse.json({ error: "Candidate not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({ success: true, candidate });
+  } catch (error: any) {
+    return NextResponse.json(
+      { error: error.message || "Internal server error" },
+      { status: 500 }
+    );
+  }
+}

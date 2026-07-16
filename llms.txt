@@ -1,0 +1,19 @@
+# Career77 — Job Board & Talent Matches
+
+Career77 is a job board platform. Below is the mapping of key public endpoints optimized for search engine crawlers and LLM answer engines.
+
+## Key Public Pages
+- `/`: Home page featuring call-to-actions, marquee, and top featured jobs.
+- `/openings`: Dynamic search and filtering board of active job postings.
+- `/openings/[slug]-[jobId]`: Complete description page for a specific opening.
+
+## Schema Markup
+- Job Detail pages (`/openings/*`) include standard **JSON-LD `JobPosting`** schemas with details like title, company name, location, and dates.
+
+## Closed Postings
+- Closed job postings respond with **HTTP 410 (Gone)** at the API level and render a clean closed status page with `noindex, nofollow` metadata.
+
+## Private Areas (Do Not Crawl)
+- `/dashboard/*` (Candidate Dashboard)
+- `/recruiter/*` (Recruiter Panel)
+- `/api/*` (Data Endpoints)
