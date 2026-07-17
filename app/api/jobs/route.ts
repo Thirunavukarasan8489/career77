@@ -24,6 +24,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const searchQuery = searchParams.get("query") || "";
     const location = searchParams.get("location") || "";
+    const experience = searchParams.get("experience") || "";
     const cursor = searchParams.get("cursor") || "";
     const limit = parseInt(searchParams.get("limit") || "10", 10);
 
@@ -38,6 +39,14 @@ export async function GET(request: Request) {
         { title: { $regex: new RegExp(searchQuery, "i") } },
         { skills: { $regex: new RegExp(searchQuery, "i") } },
       ];
+    }
+
+    if (experience) {
+      if (experience.toLowerCase() === "fresher") {
+        matchQuery.experience = { $regex: /(fresher|0-1|0-2|0\s*-\s*1|0\s*-\s*2|not specified)/i };
+      } else {
+        matchQuery.experience = { $regex: new RegExp(experience, "i") };
+      }
     }
 
     if (cursor) {

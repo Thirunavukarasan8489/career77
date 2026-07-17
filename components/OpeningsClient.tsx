@@ -2,19 +2,26 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { IJob } from "@/models/Job";
 
 export default function OpeningsClient({ initialJobs }: { initialJobs: IJob[] }) {
+  const searchParams = useSearchParams();
+  const initialQuery = searchParams.get("query") || "";
+  const initialLocation = searchParams.get("location") || "";
+  const initialExperience = searchParams.get("experience") || "";
+
   const [jobs, setJobs] = useState<IJob[]>(initialJobs);
-  const [query, setQuery] = useState("");
-  const [location, setLocation] = useState("");
+  const [query, setQuery] = useState(initialQuery);
+  const [location, setLocation] = useState(initialLocation);
+  const [experience, setExperience] = useState(initialExperience);
   const [cursor, setCursor] = useState<string | null>(
     initialJobs.length >= 10 ? initialJobs[initialJobs.length - 1]._id.toString() : null
   );
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
 
-  const isSearching = query || location;
+  const isSearching = query || location || experience;
 
   useEffect(() => {
     if (!isSearching) {
@@ -32,7 +39,7 @@ export default function OpeningsClient({ initialJobs }: { initialJobs: IJob[] })
     }, 300);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [query, location, initialJobs]);
+  }, [query, location, experience, initialJobs]);
 
   const fetchFilteredJobs = async () => {
     setLoading(true);
@@ -40,7 +47,7 @@ export default function OpeningsClient({ initialJobs }: { initialJobs: IJob[] })
       const res = await fetch(
         `/api/jobs?query=${encodeURIComponent(query)}&location=${encodeURIComponent(
           location
-        )}`
+        )}&experience=${encodeURIComponent(experience)}`
       );
       if (res.ok) {
         const data = await res.json();
@@ -61,7 +68,7 @@ export default function OpeningsClient({ initialJobs }: { initialJobs: IJob[] })
       const res = await fetch(
         `/api/jobs?query=${encodeURIComponent(query)}&location=${encodeURIComponent(
           location
-        )}&cursor=${cursor}`
+        )}&experience=${encodeURIComponent(experience)}&cursor=${cursor}`
       );
       if (res.ok) {
         const data = await res.json();
@@ -86,12 +93,31 @@ export default function OpeningsClient({ initialJobs }: { initialJobs: IJob[] })
           placeholder="Search by title or key skills (e.g. React, Node)"
           className="grow bg-white border border-slate-200 rounded-full px-6 py-3.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all shadow-sm"
         />
+        <div className="relative sm:w-56 shrink-0">
+          <select
+            value={experience}
+            onChange={(e) => setExperience(e.target.value)}
+            className="w-full bg-white border border-slate-200 rounded-full pl-6 pr-10 py-3.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all shadow-sm appearance-none cursor-pointer text-zinc-700"
+          >
+            <option value="">Select experience</option>
+            <option value="Fresher">Fresher (0-1 yrs)</option>
+            <option value="1-3">1-3 Years</option>
+            <option value="3-5">3-5 Years</option>
+            <option value="5-10">5-10 Years</option>
+            <option value="10+">10+ Years</option>
+          </select>
+          <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-400">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+        </div>
         <input
           type="text"
           value={location}
           onChange={(e) => setLocation(e.target.value)}
           placeholder="Location (e.g. Jaipur, Remote)"
-          className="sm:w-64 bg-white border border-slate-200 rounded-full px-6 py-3.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all shadow-sm"
+          className="sm:w-56 bg-white border border-slate-200 rounded-full px-6 py-3.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all shadow-sm"
         />
       </div>
 
