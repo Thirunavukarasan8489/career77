@@ -95,18 +95,24 @@ export default function Navbar() {
               </div>
             ) : (
               /* Guest */
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
                 <Link
                   href="/recruiter/login"
-                  className="text-zinc-600 text-xs sm:text-sm font-semibold hover:text-blue-600 transition-colors px-3 py-1.5"
+                  className="text-zinc-600 text-xs sm:text-sm font-semibold hover:text-blue-600 transition-colors px-2.5 py-1.5"
                 >
-                  Recruiter Login
+                  Recruiter Portal
+                </Link>
+                <Link
+                  href="/login"
+                  className="text-zinc-600 text-xs sm:text-sm font-semibold hover:text-blue-600 transition-colors px-2.5 py-1.5 border-l border-zinc-200"
+                >
+                  Candidate Login
                 </Link>
                 <Link
                   href="/register"
                   className="bg-blue-600 text-white text-xs sm:text-sm px-4.5 py-2 rounded-full hover:bg-blue-700 transition-all font-semibold shadow-sm"
                 >
-                  Register as Candidate
+                  Register
                 </Link>
               </div>
             )}

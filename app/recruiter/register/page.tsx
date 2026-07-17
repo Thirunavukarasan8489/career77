@@ -1,44 +1,55 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { signIn, useSession } from "next-auth/react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { showToast } from "@/components/Toast";
 import Link from "next/link";
 
-export default function RecruiterLoginPage() {
-  const { data: session } = useSession();
+export default function RecruiterRegisterPage() {
   const router = useRouter();
+  const [companyName, setCompanyName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    if (session) {
-      router.push("/recruiter");
-    }
-  }, [session, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim() || !password.trim()) {
-      showToast("Please enter your email and password");
+
+    if (!companyName.trim() || !email.trim() || !password.trim()) {
+      showToast("Please fill in all required fields");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      showToast("Passwords do not match");
+      return;
+    }
+
+    if (password.length < 6) {
+      showToast("Password must be at least 6 characters long");
       return;
     }
 
     setLoading(true);
     try {
-      const res = await signIn("credentials", {
-        redirect: false,
-        email: email.toLowerCase().trim(),
-        password: password.trim(),
+      const res = await fetch("/api/recruiter/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          companyName: companyName.trim(),
+          email: email.toLowerCase().trim(),
+          password: password.trim(),
+        }),
       });
 
-      if (res?.error) {
-        showToast(res.error);
+      const data = await res.json();
+
+      if (res.ok) {
+        showToast("Registration successful! Please log in.");
+        router.push("/recruiter/login");
       } else {
-        showToast("Welcome back! Redirecting...");
-        router.push("/recruiter");
+        showToast(data.error || "Registration failed");
       }
     } catch {
       showToast("Network error. Please try again.");
@@ -61,17 +72,31 @@ export default function RecruiterLoginPage() {
       <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-md">
         <div className="text-center mb-8">
           <h1 className="font-display font-extrabold text-2xl text-slate-900 mb-1.5">
-            Recruiter Login
+            Recruiter Registration
           </h1>
           <p className="text-sm text-slate-500 font-medium">
-            Post job openings and review applicant profiles.
+            Create an employer account to post openings and search candidates.
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-xs font-bold uppercase text-slate-500 mb-1.5 tracking-wider">
-              Email Address
+              Company Name <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              required
+              placeholder="e.g. TechCorp Solutions"
+              value={companyName}
+              onChange={(e) => setCompanyName(e.target.value)}
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-blue-500 focus:bg-white transition-all"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold uppercase text-slate-500 mb-1.5 tracking-wider">
+              Email Address <span className="text-red-500">*</span>
             </label>
             <input
               type="email"
@@ -85,14 +110,28 @@ export default function RecruiterLoginPage() {
 
           <div>
             <label className="block text-xs font-bold uppercase text-slate-500 mb-1.5 tracking-wider">
-              Password
+              Password <span className="text-red-500">*</span>
             </label>
             <input
               type="password"
               required
-              placeholder="••••••••"
+              placeholder="Min. 6 characters"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-blue-500 focus:bg-white transition-all"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold uppercase text-slate-500 mb-1.5 tracking-wider">
+              Confirm Password <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="password"
+              required
+              placeholder="Re-enter password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
               className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-blue-500 focus:bg-white transition-all"
             />
           </div>
@@ -102,22 +141,18 @@ export default function RecruiterLoginPage() {
             disabled={loading}
             className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white py-3 rounded-xl font-bold transition-all shadow-md mt-6 cursor-pointer"
           >
-            {loading ? "Authenticating..." : "Log In"}
+            {loading ? "Registering account..." : "Sign Up"}
           </button>
         </form>
 
         <p className="text-xs text-center text-slate-500 mt-6 font-medium">
-          Don't have an employer account?{" "}
+          Already have an account?{" "}
           <Link
-            href="/recruiter/register"
+            href="/recruiter/login"
             className="text-blue-600 hover:underline font-bold"
           >
-            Register Here
+            Log In
           </Link>
-        </p>
-
-        <p className="text-[10px] text-center text-slate-400 mt-4 font-medium border-t border-slate-100 pt-4">
-          Use email <span className="font-bold text-slate-600">recruiter@company.com</span> and password <span className="font-bold text-slate-600">password123</span> for demo access.
         </p>
       </div>
     </div>

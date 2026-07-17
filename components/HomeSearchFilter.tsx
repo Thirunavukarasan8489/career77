@@ -77,19 +77,22 @@ export default function HomeSearchFilter() {
             Select experience
           </option>
           <option value="Fresher" className="text-zinc-800">
-            Fresher (0-1 yrs)
+            Fresher
           </option>
-          <option value="1-3" className="text-zinc-800">
-            1-3 Years
+          <option value="1" className="text-zinc-800">
+            1 Year
           </option>
-          <option value="3-5" className="text-zinc-800">
-            3-5 Years
+          <option value="2" className="text-zinc-800">
+            2 Years
           </option>
-          <option value="5-10" className="text-zinc-800">
-            5-10 Years
+          <option value="3" className="text-zinc-800">
+            3 Years
           </option>
-          <option value="10+" className="text-zinc-800">
-            10+ Years
+          <option value="4" className="text-zinc-800">
+            4 Years
+          </option>
+          <option value="5" className="text-zinc-800">
+            5 Years
           </option>
         </select>
         {/* Down Chevron */}

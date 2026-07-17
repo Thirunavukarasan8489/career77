@@ -6,8 +6,8 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // 1. Recruiter route guards
-  // Protect all /recruiter paths except /recruiter/login
-  if (pathname.startsWith("/recruiter") && pathname !== "/recruiter/login") {
+  // Protect all /recruiter paths except /recruiter/login and /recruiter/register
+  if (pathname.startsWith("/recruiter") && pathname !== "/recruiter/login" && pathname !== "/recruiter/register") {
     const token = await getToken({
       req: request,
       secret: process.env.NEXTAUTH_SECRET,
@@ -24,8 +24,8 @@ export async function middleware(request: NextRequest) {
   if (pathname.startsWith("/dashboard")) {
     const candidateCookie = request.cookies.get("candidate_session")?.value;
     if (!candidateCookie) {
-      const registerUrl = new URL("/register", request.url);
-      return NextResponse.redirect(registerUrl);
+      const loginUrl = new URL("/login", request.url);
+      return NextResponse.redirect(loginUrl);
     }
   }
 

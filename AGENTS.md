@@ -26,7 +26,7 @@ Career77 is a two-role job board: **Candidate** (job seeker) and **Recruiter** (
 
 ---
 
-## 3. Screen Inventory (12 screens → 10 pages + 2 modals)
+## 3. Screen Inventory (14 screens → 12 pages + 2 modals)
 
 | # | Screen | Route | Rendering | Auth |
 |---|---|---|---|---|
@@ -42,6 +42,8 @@ Career77 is a two-role job board: **Candidate** (job seeker) and **Recruiter** (
 | 10 | Recruiter Panel | `/recruiter` | Dynamic, `noindex` | Recruiter |
 | 11 | Post Job | `/recruiter/post-job` | Dynamic, `noindex` | Recruiter |
 | 12 | Applicants View | `/recruiter/jobs/[jobId]/applicants` | Dynamic, `noindex` | Recruiter |
+| 13 | Recruiter Registration | `/recruiter/register` | Dynamic, `noindex` | Public |
+| 14 | Candidate Login | `/login` | Dynamic | Public |
 
 ---
 
@@ -297,5 +299,18 @@ All checklist items and screen inventory requirements have been fully implemente
   2. **Popular Categories Grid**: Grid cards for Tech, Marketing, Design, and HR that redirect to the job board with pre-filled filters.
   3. **How It Works Timeline**: Interactive tabbed workflow component (`components/HowItWorks.tsx`) with animated toggling for Candidates vs. Recruiters.
   4. **Trusted Company logo marquee**: An infinite horizontally scrolling marquee featuring top hiring companies.
+
+### Auth Expansion: Recruiter Registration & Dedicated Candidate Login (July 17, 2026)
+- **Recruiter Registration**:
+  - Developed the backend registration route (`app/api/recruiter/register/route.ts`) which validates fields, checks for duplicates, hashes passwords with bcryptjs, and registers the recruiter.
+  - Built the responsive Recruiter Registration page at `/recruiter/register` (`app/recruiter/register/page.tsx`) with inputs for company name, email, and password.
+  - Updated `middleware.ts` to allow public access to `/recruiter/register` without auth redirection.
+  - Added navigation links between the recruiter login and register forms.
+- **Candidate Login Page**:
+  - Split candidate sign-in logic from registration into a dedicated, fully responsive login page at `/login` (`app/login/page.tsx`).
+  - Supported the OTP challenge-response authentication flow (sending mock verification code to a 10-digit mobile number, with verification bypass code `7777`).
+  - Updated `middleware.ts` to redirect unauthenticated candidate requests hitting `/dashboard` to `/login` rather than `/register`.
+- **Navigation Menu Updates**:
+  - Restructured `components/Navbar.tsx` guest navigation links to show separate links for "Recruiter Portal" (`/recruiter/login`), "Candidate Login" (`/login`), and "Register" (`/register`).
 
 
