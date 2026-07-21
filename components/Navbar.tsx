@@ -2,123 +2,110 @@
 
 import React from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useApp } from "@/context/AppContext";
 import { useSession, signOut } from "next-auth/react";
 
 export default function Navbar() {
-  const { candidate, logoutCandidate, unreadCount } = useApp();
+  const pathname = usePathname();
+  const { candidate, logoutCandidate } = useApp();
   const { data: session } = useSession();
 
-  return (
-    <>
-      {/* MARQUEE AD BAR */}
-      <Link
-        href="/openings"
-        className="block bg-blue-900 text-white overflow-hidden whitespace-nowrap cursor-pointer hover:bg-blue-950 transition-colors"
-      >
-        <div className="inline-block py-2.5 text-xs font-semibold tracking-wider animate-marquee whitespace-nowrap">
-          <span className="mr-16">🔥 12 new openings added this week — tap to browse</span>
-          <span className="mr-16">💼 Frontend Developer, Backend Engineer & more hiring now</span>
-          <span className="mr-16">📢 Register once, get matched automatically to new jobs</span>
-          <span className="mr-16">🔥 12 new openings added this week — tap to browse</span>
-          <span className="mr-16">💼 Frontend Developer, Backend Engineer & more hiring now</span>
-          <span className="mr-16">📢 Register once, get matched automatically to new jobs</span>
-        </div>
-      </Link>
+  // Hide main public navbar on recruiter panel dashboard pages (which have their own sidebar layout)
+  if (pathname.startsWith("/recruiter") && pathname !== "/recruiter/login" && pathname !== "/recruiter/register") {
+    return null;
+  }
 
-      {/* NAV */}
-      <nav className="bg-white border-b border-zinc-200 sticky top-0 z-50 shadow-sm">
-        <div className="max-w-6xl mx-auto px-4 py-3.5 flex items-center justify-between gap-4">
+  return (
+    <nav className="bg-white border-b border-slate-200/80 sticky top-0 z-50 backdrop-blur-md bg-white/95">
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 py-3.5 flex items-center justify-between gap-4">
+        {/* Brand Logo & Main Nav Links */}
+        <div className="flex items-center gap-8">
           <Link
             href="/"
-            className="font-black text-2xl text-blue-600 tracking-tight flex items-center hover:opacity-90 transition-opacity"
+            className="font-display font-extrabold text-2xl text-blue-600 tracking-tight flex items-center hover:opacity-90 transition-opacity"
           >
-            Career<span className="text-zinc-800">77</span>
+            Career77
           </Link>
 
-          <div className="flex items-center gap-3">
-            {/* Recruiter Logged In */}
-            {session && session.user ? (
-              <div className="flex items-center gap-4 text-xs sm:text-sm font-semibold">
-                <Link
-                  href="/recruiter"
-                  className="text-zinc-600 hover:text-blue-600 transition-colors hidden sm:inline"
-                >
-                  Recruiter Panel
-                </Link>
-                <Link
-                  href="/recruiter/post-job"
-                  className="bg-blue-50 text-blue-600 px-3 py-1.5 rounded-full hover:bg-blue-100 transition-colors"
-                >
-                  + Post Job
-                </Link>
-                <button
-                  onClick={() => signOut({ callbackUrl: "/" })}
-                  className="border border-zinc-300 text-zinc-600 px-3.5 py-1.5 rounded-full hover:bg-zinc-50 transition-all font-semibold"
-                >
-                  Logout
-                </button>
-              </div>
-            ) : candidate ? (
-              /* Candidate Logged In */
-              <div className="flex items-center gap-3.5 text-xs sm:text-sm font-semibold">
-                <Link
-                  href="/dashboard/notifications"
-                  className="relative text-lg text-zinc-600 hover:text-blue-600 transition-colors p-1"
-                >
-                  🔔
-                  {unreadCount > 0 && (
-                    <span className="absolute top-0.5 right-0.5 w-2.5 h-2.5 bg-red-500 border border-white rounded-full animate-ping" />
-                  )}
-                  {unreadCount > 0 && (
-                    <span className="absolute top-0.5 right-0.5 w-2.5 h-2.5 bg-red-600 border border-white rounded-full" />
-                  )}
-                </Link>
-                <Link
-                  href="/dashboard"
-                  className="text-zinc-700 hover:text-blue-600 transition-colors hidden md:inline"
-                >
-                  {candidate.name}
-                </Link>
-                <Link
-                  href="/dashboard"
-                  className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-extrabold border border-blue-100 hover:bg-blue-100 transition-colors"
-                >
-                  {candidate.name[0].toUpperCase()}
-                </Link>
-                <button
-                  onClick={logoutCandidate}
-                  className="border border-zinc-300 text-zinc-600 px-3.5 py-1.5 rounded-full hover:bg-zinc-50 transition-all font-semibold"
-                >
-                  Logout
-                </button>
-              </div>
-            ) : (
-              /* Guest */
-              <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-                <Link
-                  href="/recruiter/login"
-                  className="text-zinc-600 text-xs sm:text-sm font-semibold hover:text-blue-600 transition-colors px-2.5 py-1.5"
-                >
-                  Recruiter Portal
-                </Link>
-                <Link
-                  href="/login"
-                  className="text-zinc-600 text-xs sm:text-sm font-semibold hover:text-blue-600 transition-colors px-2.5 py-1.5 border-l border-zinc-200"
-                >
-                  Candidate Login
-                </Link>
-                <Link
-                  href="/register"
-                  className="bg-blue-600 text-white text-xs sm:text-sm px-4.5 py-2 rounded-full hover:bg-blue-700 transition-all font-semibold shadow-sm"
-                >
-                  Register
-                </Link>
-              </div>
-            )}
+          <div className="hidden md:flex items-center gap-6 text-xs sm:text-sm font-semibold text-slate-600">
+            <Link
+              href="/openings"
+              className={`transition-colors ${pathname === "/openings" ? "text-blue-600 font-bold border-b-2 border-blue-600 pb-0.5" : "hover:text-blue-600"}`}
+            >
+              Jobs
+            </Link>
+            <Link
+              href="/companies"
+              className={`transition-colors ${pathname.startsWith("/companies") ? "text-blue-600 font-bold border-b-2 border-blue-600 pb-0.5" : "hover:text-blue-600"}`}
+            >
+              Companies
+            </Link>
+            <Link
+              href="/recruiter/login"
+              className="hover:text-blue-600 transition-colors"
+            >
+              For Employers
+            </Link>
           </div>
         </div>
-      </nav>
-    </>
+
+        {/* Auth Controls */}
+        <div className="flex items-center gap-3">
+          {session && session.user ? (
+            <div className="flex items-center gap-3 text-xs sm:text-sm font-semibold">
+              <Link
+                href="/recruiter"
+                className="bg-blue-50 text-blue-600 px-3.5 py-2 rounded-xl hover:bg-blue-100 transition-colors"
+              >
+                Recruiter Panel
+              </Link>
+              <button
+                onClick={() => signOut({ callbackUrl: "/" })}
+                className="border border-slate-200 text-slate-600 px-3.5 py-2 rounded-xl hover:bg-slate-50 transition-colors"
+              >
+                Logout
+              </button>
+            </div>
+          ) : candidate ? (
+            <div className="flex items-center gap-3 text-xs sm:text-sm font-semibold">
+              <Link
+                href="/dashboard"
+                className="text-slate-700 hover:text-blue-600 transition-colors hidden sm:inline"
+              >
+                {candidate.name}
+              </Link>
+              <Link
+                href="/dashboard"
+                className="w-9 h-9 rounded-full bg-blue-100 text-blue-700 font-extrabold flex items-center justify-center border border-blue-200"
+              >
+                {candidate.name[0].toUpperCase()}
+              </Link>
+              <button
+                onClick={logoutCandidate}
+                className="border border-slate-200 text-slate-600 px-3.5 py-2 rounded-xl hover:bg-slate-50 transition-colors"
+              >
+                Logout
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2 sm:gap-3">
+              <Link
+                href="/login"
+                className="text-slate-600 text-xs sm:text-sm font-semibold hover:text-slate-900 px-3 py-2 transition-colors"
+              >
+                Login
+              </Link>
+              <Link
+                href="/register"
+                className="bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm px-4.5 py-2 rounded-xl shadow-xs transition-all font-semibold"
+              >
+                Register
+              </Link>
+            </div>
+          )}
+        </div>
+      </div>
+    </nav>
   );
 }

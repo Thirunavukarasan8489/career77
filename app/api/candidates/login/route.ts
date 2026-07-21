@@ -8,37 +8,37 @@ export async function POST(request: Request) {
   try {
     await connectToDatabase();
     const body = await request.json().catch(() => ({}));
-    const { mobile, otp } = body;
+    const { mobile, email, otp } = body;
 
-    if (!mobile) {
-      return NextResponse.json({ error: "Mobile number is required" }, { status: 400 });
+    const searchQuery = email ? { email: email.toLowerCase().trim() } : { mobile };
+    if (!mobile && !email) {
+      return NextResponse.json({ error: "Email or mobile number is required" }, { status: 400 });
     }
 
-    const candidate = await Candidate.findOne({ mobile });
+    const candidate = await Candidate.findOne(searchQuery);
     if (!candidate) {
       return NextResponse.json(
-        { error: "No candidate found with this mobile number. Please register first.", notFound: true },
+        { error: "No candidate profile found. Please register first.", notFound: true },
         { status: 404 }
       );
     }
 
     // Phase 1: Request OTP
     if (otp === undefined) {
-      // Mock sending OTP
-      console.log(`[OTP Mock] Sent verification code to ${mobile}: 7777`);
+      console.log(`[OTP Mock] Sent verification code to ${email || mobile}: 777777`);
       return NextResponse.json({ success: true, otpSent: true });
     }
 
     // Phase 2: Verify OTP
-    if (otp !== "7777") {
-      return NextResponse.json({ error: "Invalid OTP. Use 7777 for demo access." }, { status: 400 });
+    if (otp !== "7777" && otp !== "777777") {
+      return NextResponse.json({ error: "Invalid OTP. Use 777777 for demo access." }, { status: 400 });
     }
 
-    // Login candidate and create session
     const sessionPayload = {
       candidateId: candidate._id.toString(),
-      mobile: candidate.mobile,
+      email: candidate.email || `${mobile}@candidate.local`,
       name: candidate.name,
+      role: "candidate",
     };
     const sessionToken = signCandidateSession(sessionPayload);
 

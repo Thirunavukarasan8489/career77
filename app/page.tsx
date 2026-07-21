@@ -1,291 +1,328 @@
 import Link from "next/link";
 import { connectToDatabase } from "@/lib/db";
 import { Job, IJob } from "@/models/Job";
-import HomeSearchFilter from "@/components/HomeSearchFilter";
-import HowItWorks from "@/components/HowItWorks";
 
-// Landing Page: statically generated at build-time, revalidating periodically
-export const revalidate = 60; // 60 seconds revalidation
+export const revalidate = 60;
 
 export default async function Home() {
   await connectToDatabase();
 
-  // Fetch the 4 most recent open jobs
   const rawJobs = await Job.find({ status: "open" })
     .sort({ postedAt: -1 })
-    .limit(4)
+    .limit(3)
     .lean();
 
   const featuredJobs = JSON.parse(JSON.stringify(rawJobs)) as IJob[];
 
   return (
-    <div className="flex flex-col grow">
+    <div className="flex flex-col grow bg-[#F8FAFC] antialiased">
       {/* HERO SECTION */}
-      <section className="py-20 px-4 max-w-5xl mx-auto flex flex-col items-center w-full text-center">
-        <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-200 text-blue-700 text-xs font-extrabold px-4 py-1.5 rounded-full uppercase tracking-wider mb-6 font-sans">
-          🚀 Job Board & Talent Matches
-        </div>
-        <h1 className="font-display font-black text-4xl sm:text-5xl md:text-6xl text-zinc-900 tracking-tight leading-none mb-4 max-w-3xl">
-          Find your dream job now
-        </h1>
-        <p className="text-zinc-500 text-base sm:text-lg max-w-xl mx-auto mb-10 font-medium">
-          5 Lakh+ jobs for you to explore
-        </p>
+      <section className="py-12 sm:py-20 px-4 sm:px-8 max-w-7xl mx-auto w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          {/* Left Hero Content */}
+          <div className="lg:col-span-7 space-y-6">
+            <h1 className="font-display font-extrabold text-4xl sm:text-5xl lg:text-6xl text-slate-900 tracking-tight leading-[1.1]">
+              Connect with the Future of{" "}
+              <span className="text-blue-600">Professional Growth.</span>
+            </h1>
+            <p className="text-slate-500 text-base sm:text-lg font-normal leading-relaxed max-w-xl">
+              Whether you are scaling a team or searching for your next career milestone, Career77 provides the data-driven matching to ensure the perfect fit every time.
+            </p>
 
-        {/* Search Bar Component */}
-        <div className="w-full mb-12 flex justify-center">
-          <HomeSearchFilter />
+            {/* Combined Search Box Card */}
+            <form action="/openings" method="GET" className="bg-white border border-slate-200/80 rounded-2xl p-2.5 shadow-md flex flex-col sm:flex-row items-center gap-2 max-w-2xl">
+              <div className="flex-1 flex items-center gap-3 px-3 py-2 border-b sm:border-b-0 sm:border-r border-slate-100 w-full">
+                <svg className="w-5 h-5 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+                <input
+                  type="text"
+                  name="query"
+                  placeholder="Job title or keywords"
+                  className="w-full bg-transparent text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none"
+                />
+              </div>
+
+              <div className="flex-1 flex items-center gap-3 px-3 py-2 w-full">
+                <svg className="w-5 h-5 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <input
+                  type="text"
+                  name="location"
+                  placeholder="City or remote"
+                  className="w-full bg-transparent text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none"
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm px-6 py-3 rounded-xl shadow-md shadow-blue-500/20 transition-all shrink-0 whitespace-nowrap"
+              >
+                Search Jobs
+              </button>
+            </form>
+
+            {/* Social Proof Avatar Row */}
+            <div className="flex items-center gap-3 pt-2">
+              <div className="flex -space-x-2 overflow-hidden">
+                <img
+                  className="inline-block h-8 w-8 rounded-full ring-2 ring-white object-cover"
+                  src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80&auto=format&fit=crop&q=80"
+                  alt="User avatar"
+                />
+                <img
+                  className="inline-block h-8 w-8 rounded-full ring-2 ring-white object-cover"
+                  src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&auto=format&fit=crop&q=80"
+                  alt="User avatar"
+                />
+                <img
+                  className="inline-block h-8 w-8 rounded-full ring-2 ring-white object-cover"
+                  src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&auto=format&fit=crop&q=80"
+                  alt="User avatar"
+                />
+              </div>
+              <span className="text-xs font-semibold text-slate-500">
+                <strong className="text-slate-900">12k+</strong> professionals joined this week
+              </span>
+            </div>
+          </div>
+
+          {/* Right Hero Image Card */}
+          <div className="lg:col-span-5 flex justify-center">
+            <div className="relative w-full max-w-md rounded-3xl overflow-hidden shadow-2xl border border-slate-200/60 group">
+              <img
+                src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&auto=format&fit=crop&q=80"
+                alt="Modern team collaboration"
+                className="w-full h-[380px] object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/40 via-transparent to-transparent pointer-events-none" />
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* STATISTICS BAR SECTION */}
-      <section className="bg-zinc-100 border-y border-zinc-200/60 py-10 w-full px-4">
-        <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-          <div className="bg-white border border-zinc-200/60 p-5 rounded-2xl shadow-sm hover:shadow transition-shadow">
-            <div className="font-display font-black text-3xl text-blue-600 mb-1">5 Lakh+</div>
-            <div className="text-xs uppercase font-extrabold tracking-widest text-zinc-400">Active Jobs</div>
+      {/* 4 KEY STATS BAR */}
+      <section className="bg-white border-y border-slate-200/80 py-10 w-full px-4 sm:px-8">
+        <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+          <div>
+            <div className="font-display font-extrabold text-3xl sm:text-4xl text-blue-600 tracking-tight">250K+</div>
+            <div className="text-xs font-semibold text-slate-400 mt-1">Jobs Posted</div>
           </div>
-          <div className="bg-white border border-zinc-200/60 p-5 rounded-2xl shadow-sm hover:shadow transition-shadow">
-            <div className="font-display font-black text-3xl text-blue-600 mb-1">15,000+</div>
-            <div className="text-xs uppercase font-extrabold tracking-widest text-zinc-400">Verified Recruiters</div>
+          <div>
+            <div className="font-display font-extrabold text-3xl sm:text-4xl text-blue-600 tracking-tight">12K+</div>
+            <div className="text-xs font-semibold text-slate-400 mt-1">Companies Hiring</div>
           </div>
-          <div className="bg-white border border-zinc-200/60 p-5 rounded-2xl shadow-sm hover:shadow transition-shadow">
-            <div className="font-display font-black text-3xl text-blue-600 mb-1">2.5 Lakh+</div>
-            <div className="text-xs uppercase font-extrabold tracking-widest text-zinc-400">Matches Completed</div>
+          <div>
+            <div className="font-display font-extrabold text-3xl sm:text-4xl text-blue-600 tracking-tight">85K+</div>
+            <div className="text-xs font-semibold text-slate-400 mt-1">Candidates Placed</div>
           </div>
-          <div className="bg-white border border-zinc-200/60 p-5 rounded-2xl shadow-sm hover:shadow transition-shadow">
-            <div className="font-display font-black text-3xl text-blue-600 mb-1">99%</div>
-            <div className="text-xs uppercase font-extrabold tracking-widest text-zinc-400">Success Match Rate</div>
+          <div>
+            <div className="font-display font-extrabold text-3xl sm:text-4xl text-blue-600 tracking-tight">4.9/5</div>
+            <div className="text-xs font-semibold text-slate-400 mt-1">Platform Rating</div>
           </div>
         </div>
       </section>
 
-      {/* POPULAR CATEGORIES SECTION */}
-      <section className="py-16 px-4 max-w-5xl mx-auto w-full">
-        <div className="text-center mb-12">
-          <span className="text-xs uppercase font-extrabold tracking-widest text-blue-600 block mb-2">
-            Categories
-          </span>
-          <h2 className="font-display font-bold text-3xl text-zinc-900 tracking-tight">
-            Browse Jobs by Popular Category
+      {/* HOW IT WORKS / STREAMLINING YOUR CAREER JOURNEY */}
+      <section className="py-16 sm:py-24 px-4 sm:px-8 max-w-7xl mx-auto w-full">
+        <div className="text-center max-w-2xl mx-auto mb-16">
+          <h2 className="font-display font-extrabold text-2xl sm:text-3xl text-slate-900 tracking-tight">
+            Streamlining Your Career Journey
           </h2>
-          <p className="text-sm text-zinc-500 mt-2">
-            Find the right fit according to your area of interest
+          <p className="text-xs sm:text-sm text-slate-500 font-normal mt-2">
+            Three simple steps to transition from searching to thriving in your next role.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-          {/* Card 1: Software Engineering */}
-          <Link
-            href="/openings?query=Developer"
-            className="group bg-white border border-zinc-200 rounded-2xl p-6 shadow-sm hover:border-blue-400 hover:shadow-md transition-all flex flex-col justify-between"
-          >
-            <div>
-              <div className="p-3 bg-blue-50 text-blue-600 border border-blue-100 rounded-xl w-fit mb-4 group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-600 transition-colors">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-                </svg>
-              </div>
-              <h3 className="font-display font-extrabold text-base text-zinc-900 mb-1.5">
-                Software Engineering
-              </h3>
-              <p className="text-xs text-zinc-400 font-semibold mb-6">
-                React, Node, Python, AWS
-              </p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {/* Step 1 */}
+          <div className="bg-white border border-slate-200/80 rounded-2xl p-8 text-center space-y-4 shadow-xs hover:shadow-md transition-all">
+            <div className="w-12 h-12 rounded-2xl bg-blue-600 text-white flex items-center justify-center mx-auto shadow-md shadow-blue-500/20">
+              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
             </div>
-            <span className="text-xs font-bold text-blue-600 group-hover:text-blue-700 inline-flex items-center gap-1.5">
-              Browse Openings &rarr;
-            </span>
-          </Link>
-
-          {/* Card 2: Sales & Marketing */}
-          <Link
-            href="/openings?query=Sales"
-            className="group bg-white border border-zinc-200 rounded-2xl p-6 shadow-sm hover:border-blue-400 hover:shadow-md transition-all flex flex-col justify-between"
-          >
-            <div>
-              <div className="p-3 bg-blue-50 text-blue-600 border border-blue-100 rounded-xl w-fit mb-4 group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-600 transition-colors">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
-                </svg>
-              </div>
-              <h3 className="font-display font-extrabold text-base text-zinc-900 mb-1.5">
-                Sales & Marketing
-              </h3>
-              <p className="text-xs text-zinc-400 font-semibold mb-6">
-                Outbound, BD, SEO, Ad Campaigns
-              </p>
-            </div>
-            <span className="text-xs font-bold text-blue-600 group-hover:text-blue-700 inline-flex items-center gap-1.5">
-              Browse Openings &rarr;
-            </span>
-          </Link>
-
-          {/* Card 3: Product & Design */}
-          <Link
-            href="/openings?query=Design"
-            className="group bg-white border border-zinc-200 rounded-2xl p-6 shadow-sm hover:border-blue-400 hover:shadow-md transition-all flex flex-col justify-between"
-          >
-            <div>
-              <div className="p-3 bg-blue-50 text-blue-600 border border-blue-100 rounded-xl w-fit mb-4 group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-600 transition-colors">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                </svg>
-              </div>
-              <h3 className="font-display font-extrabold text-base text-zinc-900 mb-1.5">
-                Product & Design
-              </h3>
-              <p className="text-xs text-zinc-400 font-semibold mb-6">
-                UI/UX, Figma, Product Managers
-              </p>
-            </div>
-            <span className="text-xs font-bold text-blue-600 group-hover:text-blue-700 inline-flex items-center gap-1.5">
-              Browse Openings &rarr;
-            </span>
-          </Link>
-
-          {/* Card 4: Human Resources */}
-          <Link
-            href="/openings?query=HR"
-            className="group bg-white border border-zinc-200 rounded-2xl p-6 shadow-sm hover:border-blue-400 hover:shadow-md transition-all flex flex-col justify-between"
-          >
-            <div>
-              <div className="p-3 bg-blue-50 text-blue-600 border border-blue-100 rounded-xl w-fit mb-4 group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-600 transition-colors">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                </svg>
-              </div>
-              <h3 className="font-display font-extrabold text-base text-zinc-900 mb-1.5">
-                Human Resources
-              </h3>
-              <p className="text-xs text-zinc-400 font-semibold mb-6">
-                Recruitment, Employee Roster, Ops
-              </p>
-            </div>
-            <span className="text-xs font-bold text-blue-600 group-hover:text-blue-700 inline-flex items-center gap-1.5">
-              Browse Openings &rarr;
-            </span>
-          </Link>
-        </div>
-      </section>
-
-      {/* HOW IT WORKS SECTION */}
-      <section className="bg-zinc-50 border-t border-zinc-200/60 py-16 px-4 w-full">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-12">
-            <span className="text-xs uppercase font-extrabold tracking-widest text-blue-600 block mb-2">
-              Workflow
-            </span>
-            <h2 className="font-display font-bold text-3xl text-zinc-900 tracking-tight">
-              How Career77 Works
-            </h2>
-            <p className="text-sm text-zinc-500 mt-2">
-              Simple, transparent matching process for candidates & recruiters
+            <h3 className="font-bold text-slate-900 text-lg">Create Profile</h3>
+            <p className="text-xs text-slate-500 leading-relaxed font-normal">
+              Upload your resume and let our AI index your skills to match you with top employers.
             </p>
           </div>
 
-          <HowItWorks />
+          {/* Step 2 */}
+          <div className="bg-white border border-slate-200/80 rounded-2xl p-8 text-center space-y-4 shadow-xs hover:shadow-md transition-all">
+            <div className="w-12 h-12 rounded-2xl bg-emerald-400 text-white flex items-center justify-center mx-auto shadow-md shadow-emerald-400/20">
+              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+            <h3 className="font-bold text-slate-900 text-lg">One-Click Apply</h3>
+            <p className="text-xs text-slate-500 leading-relaxed font-normal">
+              Access exclusive openings and apply instantly with personalized cover letters.
+            </p>
+          </div>
+
+          {/* Step 3 */}
+          <div className="bg-white border border-slate-200/80 rounded-2xl p-8 text-center space-y-4 shadow-xs hover:shadow-md transition-all">
+            <div className="w-12 h-12 rounded-2xl bg-amber-600 text-white flex items-center justify-center mx-auto shadow-md shadow-amber-600/20">
+              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h3 className="font-bold text-slate-900 text-lg">Get Hired</h3>
+            <p className="text-xs text-slate-500 leading-relaxed font-normal">
+              Interview with top-tier companies and land your dream job with expert negotiation tools.
+            </p>
+          </div>
         </div>
       </section>
 
-      {/* FEATURED JOBS */}
-      <section className="border-t border-zinc-200/60 py-16 px-4 bg-white w-full">
-        <div className="max-w-5xl mx-auto">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-4">
+      {/* FEATURED OPPORTUNITIES SECTION */}
+      <section className="bg-blue-50/40 border-y border-slate-200/60 py-16 sm:py-20 px-4 sm:px-8 w-full">
+        <div className="max-w-7xl mx-auto space-y-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <span className="text-xs uppercase font-extrabold tracking-widest text-blue-600 block mb-2">
-                Latest Postings
-              </span>
-              <h2 className="font-display font-bold text-3xl text-zinc-900 tracking-tight">
-                Featured Openings
+              <h2 className="font-display font-extrabold text-2xl sm:text-3xl text-slate-900 tracking-tight">
+                Featured Opportunities
               </h2>
+              <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
+                Hand-picked roles from top-performing companies this week.
+              </p>
             </div>
             <Link
               href="/openings"
-              className="text-sm font-bold text-blue-600 hover:text-blue-700 inline-flex items-center gap-1 cursor-pointer"
+              className="text-xs font-bold text-blue-600 hover:text-blue-700 inline-flex items-center gap-1.5 transition-colors self-start sm:self-auto"
             >
-              See All Openings &rarr;
+              <span>View All Jobs</span>
+              <span>&rarr;</span>
             </Link>
           </div>
 
-          {featuredJobs.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {featuredJobs.map((job) => (
-                <Link
-                  key={job._id.toString()}
-                  href={`/openings/${job.slug}-${job._id.toString()}`}
-                  className="bg-white border border-zinc-200 rounded-xl p-5 hover:border-blue-400 hover:shadow-md transition-all group flex flex-col justify-between"
-                >
-                  <div>
-                    <h3 className="font-bold text-lg text-zinc-900 group-hover:text-blue-600 transition-colors mb-1.5">
-                      {job.title}
-                    </h3>
-                    <p className="text-xs font-semibold text-zinc-500 mb-4">
-                      📍 {job.location} &middot; 💼 {job.experience || "Not specified"}
-                    </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Card 1 */}
+            <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-6">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 font-bold text-xs">
+                    LOGO
                   </div>
-                  <div className="flex flex-wrap gap-1.5 mt-auto">
-                    {job.skills.map((skill) => (
-                      <span
-                        key={skill}
-                        className="bg-blue-50 text-blue-600 text-xs px-2.5 py-1 rounded-md font-bold"
-                      >
-                        {skill}
-                      </span>
-                    ))}
-                  </div>
+                  <span className="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full">
+                    Featured
+                  </span>
+                </div>
+                <div>
+                  <h3 className="font-bold text-slate-900 text-base">Senior UX Designer</h3>
+                  <p className="text-xs text-slate-400 font-medium mt-0.5">📍 Mountain View, CA (Remote)</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="bg-slate-100 text-slate-600 font-semibold text-xs px-2.5 py-0.5 rounded-full">
+                    Full-time
+                  </span>
+                  <span className="bg-slate-100 text-slate-600 font-semibold text-xs px-2.5 py-0.5 rounded-full">
+                    $140k - $190k
+                  </span>
+                </div>
+              </div>
+              <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
+                <span className="text-slate-400 font-medium">Posted 2 days ago</span>
+                <Link href="/openings" className="font-bold text-blue-600 hover:underline">
+                  Apply Now
                 </Link>
-              ))}
+              </div>
             </div>
-          ) : (
-            <div className="text-center py-16 border-2 border-dashed border-zinc-200 rounded-xl bg-white text-zinc-500">
-              <span className="block text-4xl mb-3">💼</span>
-              <p className="font-medium text-zinc-500">No openings posted yet.</p>
-              <Link
-                href="/recruiter/login"
-                className="text-sm text-blue-600 hover:underline mt-1 inline-block"
-              >
-                Recruiters: Post a job now
-              </Link>
+
+            {/* Card 2 */}
+            <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-6">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-xs">
+                    ⬡
+                  </div>
+                  <span className="bg-slate-100 text-slate-600 text-[10px] font-bold px-2.5 py-0.5 rounded-full">
+                    Hot
+                  </span>
+                </div>
+                <div>
+                  <h3 className="font-bold text-slate-900 text-base">Lead Backend Engineer</h3>
+                  <p className="text-xs text-slate-400 font-medium mt-0.5">📍 Berlin, Germany</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="bg-slate-100 text-slate-600 font-semibold text-xs px-2.5 py-0.5 rounded-full">
+                    Contract
+                  </span>
+                  <span className="bg-slate-100 text-slate-600 font-semibold text-xs px-2.5 py-0.5 rounded-full">
+                    €90k - €120k
+                  </span>
+                </div>
+              </div>
+              <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
+                <span className="text-slate-400 font-medium">Posted 5 hours ago</span>
+                <Link href="/openings" className="font-bold text-blue-600 hover:underline">
+                  Apply Now
+                </Link>
+              </div>
             </div>
-          )}
+
+            {/* Card 3 */}
+            <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-6">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-xs">
+                    🏛️
+                  </div>
+                  <span className="bg-blue-100 text-blue-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full">
+                    High Yield
+                  </span>
+                </div>
+                <div>
+                  <h3 className="font-bold text-slate-900 text-base">Fintech Product Lead</h3>
+                  <p className="text-xs text-slate-400 font-medium mt-0.5">📍 London, UK</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="bg-slate-100 text-slate-600 font-semibold text-xs px-2.5 py-0.5 rounded-full">
+                    Full-time
+                  </span>
+                  <span className="bg-slate-100 text-slate-600 font-semibold text-xs px-2.5 py-0.5 rounded-full">
+                    £110k - £160k
+                  </span>
+                </div>
+              </div>
+              <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
+                <span className="text-slate-400 font-medium">Posted 1 day ago</span>
+                <Link href="/openings" className="font-bold text-blue-600 hover:underline">
+                  Apply Now
+                </Link>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* TRUSTED PARTNER LOGOS */}
-      <section className="py-16 bg-white border-t border-zinc-200/60 overflow-hidden">
-        <div className="max-w-5xl mx-auto px-4 text-center mb-8">
-          <span className="text-xs uppercase font-extrabold tracking-widest text-blue-600 block mb-2">
-            Partners
-          </span>
-          <h2 className="font-display font-bold text-3xl text-zinc-900 tracking-tight">
-            Top Employers Hiring Now
-          </h2>
-        </div>
-        <div className="relative w-full flex items-center overflow-x-hidden py-4 bg-zinc-50 border-y border-zinc-150">
-          <div className="flex gap-12 items-center animate-marquee whitespace-nowrap min-w-full">
-            {/* Slide 1 */}
-            <div className="flex gap-12 items-center shrink-0">
-              {["TechCorp", "InnovateLabs", "GrowthCo", "CloudScale", "ApexDigital", "CoreSystems", "SmartSolutions", "NetGlobal"].map((name) => (
-                <div
-                  key={name}
-                  className="inline-flex items-center justify-center bg-white border border-zinc-200/80 rounded-xl px-8 py-4 shadow-sm min-w-[160px] font-display font-extrabold text-lg text-zinc-400 hover:text-blue-600 hover:border-blue-200 transition-colors select-none"
-                >
-                  {name}
-                </div>
-              ))}
-            </div>
-            {/* Slide 2 */}
-            <div className="flex gap-12 items-center shrink-0">
-              {["TechCorp", "InnovateLabs", "GrowthCo", "CloudScale", "ApexDigital", "CoreSystems", "SmartSolutions", "NetGlobal"].map((name) => (
-                <div
-                  key={name + "-dup"}
-                  className="inline-flex items-center justify-center bg-white border border-zinc-200/80 rounded-xl px-8 py-4 shadow-sm min-w-[160px] font-display font-extrabold text-lg text-zinc-400 hover:text-blue-600 hover:border-blue-200 transition-colors select-none"
-                >
-                  {name}
-                </div>
-              ))}
-            </div>
+      {/* BOTTOM CTA BANNER */}
+      <section className="py-16 px-4 sm:px-8 max-w-7xl mx-auto w-full">
+        <div className="bg-blue-50/80 border border-blue-100 rounded-3xl p-8 sm:p-12 flex flex-col md:flex-row items-center justify-between gap-8 shadow-xs">
+          <div className="space-y-2 text-center md:text-left">
+            <h2 className="font-display font-extrabold text-2xl sm:text-3xl text-slate-900 tracking-tight">
+              Ready to upgrade your professional life?
+            </h2>
+            <p className="text-xs sm:text-sm text-blue-700 font-medium max-w-xl">
+              Join the community of 2M+ professionals already using Career77 to find their place in the future economy.
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row items-center gap-3 shrink-0 w-full sm:w-auto">
+            <Link
+              href="/register"
+              className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm px-6 py-3.5 rounded-xl shadow-md shadow-blue-500/20 transition-all text-center"
+            >
+              Get Started Free
+            </Link>
+            <Link
+              href="/recruiter/login"
+              className="w-full sm:w-auto bg-white hover:bg-slate-50 text-slate-800 font-bold text-xs sm:text-sm px-6 py-3.5 rounded-xl border border-slate-200/80 shadow-xs transition-colors text-center"
+            >
+              Hire Talent
+            </Link>
           </div>
         </div>
       </section>

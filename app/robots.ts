@@ -6,22 +6,20 @@ export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
       {
-        // General search engines (Googlebot, Bingbot, etc.)
         userAgent: "*",
-        allow: ["/", "/openings", "/openings/*"],
-        disallow: ["/dashboard/", "/recruiter/", "/api/"],
+        allow: ["/", "/jobs", "/jobs/*", "/companies/*"],
+        disallow: ["/candidate/", "/dashboard/", "/recruiter/", "/admin/", "/api/"],
       },
       {
-        // AI Crawlers (deliberate choice: allow public jobs indexing for search/recommendations,
-        // but block all registration, dashboard, and recruiter routes)
         userAgent: ["GPTBot", "ClaudeBot", "PerplexityBot", "Google-Extended"],
-        allow: ["/", "/openings/*"],
+        allow: ["/", "/jobs/*", "/companies/*"],
         disallow: [
+          "/candidate/",
           "/dashboard/",
           "/recruiter/",
+          "/admin/",
           "/api/",
           "/register/",
-          "/register/*",
         ],
       },
     ],

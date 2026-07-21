@@ -1,4 +1,5 @@
 import React from "react";
+import RecruiterLayoutClient from "@/components/RecruiterLayoutClient";
 
 // Block all recruiter panel pages from crawlers (Section 5)
 export const metadata = {
@@ -10,5 +11,6 @@ export default function RecruiterLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return <RecruiterLayoutClient>{children}</RecruiterLayoutClient>;
 }
+

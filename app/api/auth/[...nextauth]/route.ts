@@ -2,6 +2,7 @@ import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { connectToDatabase } from "@/lib/db";
+import { User } from "@/models/User";
 import { Recruiter } from "@/models/Recruiter";
 
 export const authOptions: NextAuthOptions = {
@@ -18,24 +19,37 @@ export const authOptions: NextAuthOptions = {
         }
 
         await connectToDatabase();
-        const recruiter = await Recruiter.findOne({
-          email: credentials.email.toLowerCase(),
-        });
+        const emailLower = credentials.email.toLowerCase().trim();
 
-        if (!recruiter || !recruiter.password) {
-          throw new Error("Incorrect email or password");
+        // 1. Try finding in User model
+        const user = await User.findOne({ email: emailLower });
+        if (user && user.password) {
+          const isValid = await bcrypt.compare(credentials.password, user.password);
+          if (isValid) {
+            return {
+              id: user._id.toString(),
+              email: user.email,
+              name: user.email.split("@")[0],
+              role: user.role,
+            };
+          }
         }
 
-        const isValid = await bcrypt.compare(credentials.password, recruiter.password);
-        if (!isValid) {
-          throw new Error("Incorrect email or password");
+        // 2. Fallback check for Recruiter model legacy entries
+        const recruiter = await Recruiter.findOne({ email: emailLower });
+        if (recruiter && recruiter.password) {
+          const isValid = await bcrypt.compare(credentials.password, recruiter.password);
+          if (isValid) {
+            return {
+              id: recruiter._id.toString(),
+              email: recruiter.email,
+              name: recruiter.companyName || "Recruiter",
+              role: "recruiter",
+            };
+          }
         }
 
-        return {
-          id: recruiter._id.toString(),
-          email: recruiter.email,
-          name: recruiter.companyName || "Recruiter",
-        };
+        throw new Error("Incorrect email or password");
       },
     }),
   ],
@@ -44,19 +58,21 @@ export const authOptions: NextAuthOptions = {
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   pages: {
-    signIn: "/recruiter/login",
+    signIn: "/login",
   },
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
         token.name = user.name;
+        token.role = (user as any).role || "candidate";
       }
       return token;
     },
     async session({ session, token }) {
       if (token && session.user) {
         (session.user as any).id = token.id;
+        (session.user as any).role = token.role;
         session.user.name = token.name;
       }
       return session;

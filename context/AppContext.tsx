@@ -5,12 +5,13 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 export interface CandidateProfile {
   _id: string;
   name: string;
-  mobile: string;
+  mobile?: string;
   email?: string;
   experience?: string;
   city?: string;
   skills: string[];
-  lookingFor: string;
+  lookingFor?: string;
+  bio?: string;
   resumeUrl?: string;
   resumePublicId?: string;
 }
@@ -39,7 +40,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         const data = await res.json();
         setCandidate(data.candidate);
 
-        // Fetch unread notifications
         const notifRes = await fetch("/api/notifications");
         if (notifRes.ok) {
           const notifData = await notifRes.json();

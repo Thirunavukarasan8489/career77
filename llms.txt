@@ -1,19 +1,22 @@
-# Career77 — Job Board & Talent Matches
+# Career77 — SaaS Job Board & Applicant Tracking System
 
-Career77 is a job board platform. Below is the mapping of key public endpoints optimized for search engine crawlers and LLM answer engines.
+Career77 is a 3-role ATS platform (Candidate, Recruiter, Super Admin). Below is the mapping of key public endpoints optimized for search engine crawlers and LLM answer engines.
 
 ## Key Public Pages
-- `/`: Home page featuring call-to-actions, marquee, and top featured jobs.
-- `/openings`: Dynamic search and filtering board of active job postings.
-- `/openings/[slug]-[jobId]`: Complete description page for a specific opening.
+- `/`: Home page featuring hero section, search filter, marquee, and top featured jobs.
+- `/jobs`: Dynamic search and filtering board of active job postings.
+- `/jobs/[jobId]`: Complete description page for a specific job opening.
+- `/companies/[slug]`: Public company profile with company info, verified status, and open job listings.
 
 ## Schema Markup
-- Job Detail pages (`/openings/*`) include standard **JSON-LD `JobPosting`** schemas with details like title, company name, location, and dates.
+- Job Detail pages (`/jobs/*`) include standard **JSON-LD `JobPosting`** schema with title, organization, location, and dates.
+- Company Profile pages (`/companies/*`) include standard **JSON-LD `Organization`** schema.
 
 ## Closed Postings
-- Closed job postings respond with **HTTP 410 (Gone)** at the API level and render a clean closed status page with `noindex, nofollow` metadata.
+- Closed job postings respond with **HTTP 410 (Gone)** at the API level and render a clean closed status page with `noindex, follow: false` metadata.
 
 ## Private Areas (Do Not Crawl)
-- `/dashboard/*` (Candidate Dashboard)
-- `/recruiter/*` (Recruiter Panel)
+- `/candidate/*` & `/dashboard/*` (Candidate Portal)
+- `/recruiter/*` (Recruiter Portal)
+- `/admin/*` (Super Admin Portal)
 - `/api/*` (Data Endpoints)

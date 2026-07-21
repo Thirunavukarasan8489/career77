@@ -22,23 +22,24 @@ export async function POST(request: Request) {
       resumePublicId,
     } = body;
 
-    if (!name || !mobile || !lookingFor) {
+    if (!name || (!email && !mobile)) {
       return NextResponse.json(
-        { error: "Missing required fields (name, mobile, lookingFor)" },
+        { error: "Missing required fields (name and email)" },
         { status: 400 }
       );
     }
 
+    const emailLower = (email || `${mobile}@candidate.local`).toLowerCase().trim();
+
     // Check duplicate
-    const existing = await Candidate.findOne({ mobile });
+    const existing = await Candidate.findOne({ email: emailLower });
     if (existing) {
       return NextResponse.json(
-        { error: "This mobile number is already registered" },
+        { error: "This email address is already registered" },
         { status: 409 }
       );
     }
 
-    // Parse skills
     let skillsArray: string[] = [];
     if (Array.isArray(skills)) {
       skillsArray = skills;
@@ -51,20 +52,21 @@ export async function POST(request: Request) {
 
     const candidate = await Candidate.create({
       name,
+      email: emailLower,
       mobile,
-      email,
       experience,
       city,
       skills: skillsArray,
-      lookingFor,
+      lookingFor: lookingFor || "Software Developer",
       resumeUrl,
       resumePublicId,
     });
 
     const sessionPayload = {
       candidateId: candidate._id.toString(),
-      mobile: candidate.mobile,
+      email: candidate.email,
       name: candidate.name,
+      role: "candidate",
     };
     const sessionToken = signCandidateSession(sessionPayload);
 
@@ -101,23 +103,20 @@ export async function GET() {
       return NextResponse.json({ candidate });
     }
 
-    // Check recruiter session
-    const recSession = await getServerSession(authOptions);
-    if (recSession && recSession.user) {
-      const candidates = await Candidate.find({});
-      return NextResponse.json({ candidates });
+    const nextAuthSession = await getServerSession(authOptions);
+    if (nextAuthSession && nextAuthSession.user?.email) {
+      const candidate = await Candidate.findOne({ email: nextAuthSession.user.email.toLowerCase() });
+      return NextResponse.json({ candidate });
     }
 
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const candidates = await Candidate.find({}).sort({ createdAt: -1 }).limit(50);
+    return NextResponse.json({ candidates });
   } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message || "Internal server error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
 
-export async function PATCH(request: Request) {
+export async function PUT(request: Request) {
   try {
     await connectToDatabase();
     const cookieStore = await cookies();
@@ -128,46 +127,15 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const body = await request.json().catch(() => ({}));
-    const { name, email, experience, city, skills, lookingFor } = body;
-
-    const updateData: any = {};
-    if (name !== undefined) updateData.name = name.trim();
-    if (email !== undefined) updateData.email = email.trim();
-    if (experience !== undefined) updateData.experience = experience.trim();
-    if (city !== undefined) updateData.city = city.trim();
-    if (lookingFor !== undefined) updateData.lookingFor = lookingFor.trim();
-
-    if (skills !== undefined) {
-      if (Array.isArray(skills)) {
-        updateData.skills = skills;
-      } else if (typeof skills === "string") {
-        updateData.skills = skills
-          .split(",")
-          .map((s) => s.trim())
-          .filter(Boolean);
-      }
-    }
-
-    if (Object.keys(updateData).length === 0) {
-      return NextResponse.json({ error: "No fields to update provided" }, { status: 400 });
-    }
-
+    const body = await request.json();
     const candidate = await Candidate.findByIdAndUpdate(
       session.candidateId,
-      updateData,
+      { $set: body },
       { new: true }
     );
 
-    if (!candidate) {
-      return NextResponse.json({ error: "Candidate not found" }, { status: 404 });
-    }
-
-    return NextResponse.json({ success: true, candidate });
+    return NextResponse.json({ candidate });
   } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message || "Internal server error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

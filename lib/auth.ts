@@ -4,8 +4,9 @@ const SECRET = process.env.NEXTAUTH_SECRET || "fallback-secret-for-candidate-aut
 
 export interface CandidateSession {
   candidateId: string;
-  mobile: string;
+  email: string;
   name: string;
+  role?: string;
 }
 
 /**

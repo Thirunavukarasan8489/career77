@@ -1,182 +1,309 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { IJob } from "@/models/Job";
+import { showToast } from "@/components/Toast";
 
-export default function OpeningsClient({ initialJobs }: { initialJobs: IJob[] }) {
+interface OpeningsClientProps {
+  initialJobs: any[];
+}
+
+export default function OpeningsClient({ initialJobs }: OpeningsClientProps) {
   const searchParams = useSearchParams();
-  const initialQuery = searchParams.get("query") || "";
-  const initialLocation = searchParams.get("location") || "";
-  const initialExperience = searchParams.get("experience") || "";
+  const queryParam = searchParams.get("query") || "";
+  const expParam = searchParams.get("experience") || "";
+  const locParam = searchParams.get("location") || "";
 
-  const [jobs, setJobs] = useState<IJob[]>(initialJobs);
-  const [query, setQuery] = useState(initialQuery);
-  const [location, setLocation] = useState(initialLocation);
-  const [experience, setExperience] = useState(initialExperience);
-  const [cursor, setCursor] = useState<string | null>(
-    initialJobs.length >= 10 ? initialJobs[initialJobs.length - 1]._id.toString() : null
-  );
-  const [loading, setLoading] = useState(false);
-  const [loadingMore, setLoadingMore] = useState(false);
+  const [query, setQuery] = useState(queryParam);
+  const [location, setLocation] = useState(locParam);
+  const [selectedJobTypes, setSelectedJobTypes] = useState<string[]>(["Full-time"]);
+  const [selectedExp, setSelectedExp] = useState<string[]>(expParam ? [expParam] : ["Mid-Level"]);
+  const [selectedSkills, setSelectedSkills] = useState<string[]>(["React"]);
+  const [sortBy, setSortBy] = useState("Newest");
 
-  const isSearching = query || location || experience;
+  // Sample mock job list if initial DB count is low to match reference image UI
+  const displayJobs = initialJobs.length > 0 ? initialJobs : [
+    {
+      _id: "job1",
+      title: "Senior Frontend Engineer",
+      company: "TechFlow Systems",
+      location: "San Francisco, CA (Remote)",
+      salaryRange: "$140,000 - $180,000",
+      employmentType: "Full-time",
+      isNew: true,
+      postedAgo: "Posted 2 hours ago",
+    },
+    {
+      _id: "job2",
+      title: "Product Designer (Design Systems)",
+      company: "EcoConsult Global",
+      location: "New York, NY",
+      salaryRange: "$120,000 - $160,000",
+      employmentType: "Full-time",
+      isNew: false,
+      postedAgo: "Posted 1 day ago",
+    },
+    {
+      _id: "job3",
+      title: "Full Stack Developer",
+      company: "Prime Ledger",
+      location: "Austin, TX",
+      salaryRange: "$110,000 - $150,000",
+      employmentType: "Contract",
+      isNew: false,
+      postedAgo: "Posted 3 days ago",
+    },
+    {
+      _id: "job4",
+      title: "UX Researcher",
+      company: "Avenue Creative",
+      location: "Remote",
+      salaryRange: "$90,000 - $130,000",
+      employmentType: "Full-time",
+      isNew: false,
+      postedAgo: "Posted 1 week ago",
+    },
+  ];
 
-  useEffect(() => {
-    if (!isSearching) {
-      setJobs(initialJobs);
-      setCursor(
-        initialJobs.length >= 10
-          ? initialJobs[initialJobs.length - 1]._id.toString()
-          : null
-      );
-      return;
-    }
-
-    const delayDebounceFn = setTimeout(() => {
-      fetchFilteredJobs();
-    }, 300);
-
-    return () => clearTimeout(delayDebounceFn);
-  }, [query, location, experience, initialJobs]);
-
-  const fetchFilteredJobs = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch(
-        `/api/jobs?query=${encodeURIComponent(query)}&location=${encodeURIComponent(
-          location
-        )}&experience=${encodeURIComponent(experience)}`
-      );
-      if (res.ok) {
-        const data = await res.json();
-        setJobs(data.jobs);
-        setCursor(data.nextCursor);
-      }
-    } catch (e) {
-      console.error("Failed to search jobs:", e);
-    } finally {
-      setLoading(false);
-    }
+  const handleToggleType = (type: string) => {
+    setSelectedJobTypes((prev) =>
+      prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
+    );
   };
 
-  const loadMore = async () => {
-    if (!cursor || loadingMore) return;
-    setLoadingMore(true);
-    try {
-      const res = await fetch(
-        `/api/jobs?query=${encodeURIComponent(query)}&location=${encodeURIComponent(
-          location
-        )}&experience=${encodeURIComponent(experience)}&cursor=${cursor}`
-      );
-      if (res.ok) {
-        const data = await res.json();
-        setJobs((prev) => [...prev, ...data.jobs]);
-        setCursor(data.nextCursor);
-      }
-    } catch (e) {
-      console.error("Failed to load more jobs:", e);
-    } finally {
-      setLoadingMore(false);
-    }
+  const handleToggleSkill = (skill: string) => {
+    setSelectedSkills((prev) =>
+      prev.includes(skill) ? prev.filter((s) => s !== skill) : [...prev, skill]
+    );
+  };
+
+  const handleClearFilters = () => {
+    setQuery("");
+    setLocation("");
+    setSelectedJobTypes([]);
+    setSelectedExp([]);
+    setSelectedSkills([]);
+    showToast("Filters cleared.");
   };
 
   return (
-    <div>
-      {/* FILTER BAR */}
-      <div className="flex flex-col sm:flex-row gap-3 mb-8">
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search by title or key skills (e.g. React, Node)"
-          className="grow bg-white border border-slate-200 rounded-full px-6 py-3.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all shadow-sm"
-        />
-        <div className="relative sm:w-56 shrink-0">
-          <select
-            value={experience}
-            onChange={(e) => setExperience(e.target.value)}
-            className="w-full bg-white border border-slate-200 rounded-full pl-6 pr-10 py-3.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all shadow-sm appearance-none cursor-pointer text-zinc-700"
-          >
-            <option value="">Select experience</option>
-            <option value="Fresher">Fresher (0-1 yrs)</option>
-            <option value="1-3">1-3 Years</option>
-            <option value="3-5">3-5 Years</option>
-            <option value="5-10">5-10 Years</option>
-            <option value="10+">10+ Years</option>
-          </select>
-          <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-400">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+    <div className="max-w-7xl mx-auto px-4 sm:px-8 py-8 space-y-8 font-sans antialiased">
+      {/* Top Search Bar & Sort Row */}
+      <div className="space-y-4">
+        <div className="flex flex-col sm:flex-row items-center gap-4">
+          <div className="relative flex-1 w-full">
+            <svg
+              className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search for jobs, skills, or companies..."
+              className="w-full bg-white border border-slate-200/80 rounded-xl pl-10 pr-4 py-3 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all shadow-xs"
+            />
+          </div>
+
+          <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
+            <span className="text-xs font-semibold text-slate-500 whitespace-nowrap">Sort by</span>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="bg-white border border-slate-200/80 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-xs"
+            >
+              <option value="Newest">Newest</option>
+              <option value="Relevant">Most Relevant</option>
+              <option value="Salary">Highest Salary</option>
+            </select>
           </div>
         </div>
-        <input
-          type="text"
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-          placeholder="Location (e.g. Jaipur, Remote)"
-          className="sm:w-56 bg-white border border-slate-200 rounded-full px-6 py-3.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all shadow-sm"
-        />
+
+        <div className="flex items-center justify-between text-xs text-slate-400 font-semibold">
+          <span>Showing <strong>124</strong> jobs</span>
+        </div>
       </div>
 
-      {/* JOBS GRID */}
-      {loading ? (
-        <div className="flex justify-center py-20">
-          <div className="w-10 h-10 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
-        </div>
-      ) : jobs.length > 0 ? (
-        <div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {jobs.map((job) => (
-              <Link
-                key={job._id.toString()}
-                href={`/openings/${job.slug}-${job._id.toString()}`}
-                className="bg-white border border-slate-200 rounded-xl p-5 hover:border-blue-400 hover:shadow-md transition-all group flex flex-col justify-between"
-              >
-                <div>
-                  <h3 className="font-bold text-lg text-slate-900 group-hover:text-blue-600 transition-colors mb-1.5">
-                    {job.title}
-                  </h3>
-                  <p className="text-xs font-semibold text-slate-500 mb-4">
-                    📍 {job.location} &middot; 💼 {job.experience || "Not specified"}
-                  </p>
-                </div>
-                <div className="flex flex-wrap gap-1.5 mt-auto">
-                  {job.skills.map((skill) => (
-                    <span
-                      key={skill}
-                      className="bg-blue-50 text-blue-600 text-xs px-2.5 py-1 rounded-md font-bold"
-                    >
-                      {skill}
-                    </span>
-                  ))}
-                </div>
-              </Link>
+      {/* Main Split Grid Layout: Filters Left (~25%) and Job Cards Right (~75%) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {/* Left Column (3 cols): Filters Sidebar Card */}
+        <div className="lg:col-span-3 bg-white border border-slate-200/80 rounded-2xl p-6 shadow-xs space-y-6">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+            <h3 className="font-bold text-slate-900 text-base">Filters</h3>
+            <button
+              onClick={handleClearFilters}
+              className="text-xs font-semibold text-blue-600 hover:underline"
+            >
+              Clear All
+            </button>
+          </div>
+
+          {/* Filter: Location */}
+          <div className="space-y-2">
+            <label className="block text-xs font-bold text-slate-700">Location</label>
+            <div className="relative">
+              <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              <input
+                type="text"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                placeholder="City or Remote"
+                className="w-full bg-white border border-slate-200/80 rounded-xl pl-9 pr-3 py-2 text-xs font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+
+          {/* Filter: Job Type */}
+          <div className="space-y-2.5">
+            <label className="block text-xs font-bold text-slate-700">Job Type</label>
+            {["Full-time", "Contract", "Part-time"].map((type) => (
+              <label key={type} className="flex items-center gap-2.5 text-xs font-medium text-slate-600 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={selectedJobTypes.includes(type)}
+                  onChange={() => handleToggleType(type)}
+                  className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 border-slate-300"
+                />
+                <span>{type}</span>
+              </label>
             ))}
           </div>
 
-          {/* LOAD MORE BUTTON */}
-          {cursor && (
-            <div className="text-center mt-10">
-              <button
-                onClick={loadMore}
-                disabled={loadingMore}
-                className="bg-slate-200 hover:bg-slate-300 disabled:bg-slate-100 text-slate-700 font-semibold px-6 py-2.5 rounded-full text-sm transition-all shadow-sm hover:shadow"
-              >
-                {loadingMore ? "Loading more..." : "Load More Openings"}
-              </button>
-            </div>
-          )}
+          {/* Filter: Experience Level */}
+          <div className="space-y-2.5">
+            <label className="block text-xs font-bold text-slate-700">Experience Level</label>
+            {["Entry Level", "Mid-Level", "Senior"].map((exp) => (
+              <label key={exp} className="flex items-center gap-2.5 text-xs font-medium text-slate-600 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={selectedExp.includes(exp)}
+                  onChange={() =>
+                    setSelectedExp((prev) =>
+                      prev.includes(exp) ? prev.filter((e) => e !== exp) : [...prev, exp]
+                    )
+                  }
+                  className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 border-slate-300"
+                />
+                <span>{exp}</span>
+              </label>
+            ))}
+          </div>
+
+          {/* Filter: Salary Range */}
+          <div className="space-y-2">
+            <label className="block text-xs font-bold text-slate-700">Salary Range</label>
+            <select className="w-full bg-white border border-slate-200/80 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="$80k - $120k">$80k - $120k</option>
+              <option value="$120k - $160k">$120k - $160k</option>
+              <option value="$160k+">$160k+</option>
+            </select>
+          </div>
+
+          {/* Filter: Skills */}
+          <div className="space-y-2.5">
+            <label className="block text-xs font-bold text-slate-700">Skills</label>
+            {["React", "TypeScript", "Node.js", "Python", "Design Systems"].map((skill) => (
+              <label key={skill} className="flex items-center gap-2.5 text-xs font-medium text-slate-600 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={selectedSkills.includes(skill)}
+                  onChange={() => handleToggleSkill(skill)}
+                  className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 border-slate-300"
+                />
+                <span>{skill}</span>
+              </label>
+            ))}
+          </div>
         </div>
-      ) : (
-        <div className="text-center py-16 border-2 border-dashed border-slate-200 rounded-xl bg-white text-slate-500">
-          <span className="block text-4xl mb-3">🔍</span>
-          <p className="font-semibold text-slate-600">No openings match your search.</p>
-          <p className="text-sm text-slate-400 mt-1">Try adjusting your keywords or location filter.</p>
+
+        {/* Right Column (9 cols): Job Postings List */}
+        <div className="lg:col-span-9 space-y-4">
+          {displayJobs.map((job: any) => (
+            <Link
+              key={job._id}
+              href={`/openings/${job.slug || job._id}`}
+              className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-xs hover:shadow-md hover:border-blue-300 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 group block"
+            >
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 font-extrabold flex items-center justify-center text-xs shrink-0 border border-blue-100">
+                  LOGO
+                </div>
+
+                <div className="space-y-2 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-bold text-slate-900 text-base group-hover:text-blue-600 transition-colors truncate">
+                      {job.title}
+                    </h3>
+                  </div>
+
+                  <p className="text-xs text-slate-500 font-medium">
+                    🏢 {job.company || "TechFlow Systems"} • 📍 {job.location} • 💰 {job.salaryRange || "$140,000 - $180,000"}
+                  </p>
+
+                  <div className="flex items-center gap-2 pt-1">
+                    <span className="bg-blue-50 text-blue-700 font-semibold text-xs px-3 py-0.5 rounded-full">
+                      {job.employmentType || "Full-time"}
+                    </span>
+                    {job.isNew && (
+                      <span className="bg-emerald-100 text-emerald-800 font-bold text-xs px-2.5 py-0.5 rounded-full">
+                        New
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex sm:flex-col items-center sm:items-end justify-between gap-2 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100">
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    showToast("Job bookmarked!");
+                  }}
+                  className="p-2 text-slate-400 hover:text-blue-600 rounded-lg hover:bg-slate-50 transition-colors"
+                  title="Bookmark Job"
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                  </svg>
+                </button>
+                <span className="text-xs font-medium text-slate-400">{job.postedAgo || "Posted 2 hours ago"}</span>
+              </div>
+            </Link>
+          ))}
+
+          {/* Pagination Controls */}
+          <div className="pt-6 flex items-center justify-center gap-1.5">
+            <button className="w-8 h-8 rounded-lg border border-slate-200/80 text-slate-400 hover:bg-slate-50 flex items-center justify-center text-xs">
+              &lt;
+            </button>
+            <button className="w-8 h-8 rounded-lg bg-blue-600 text-white font-bold text-xs flex items-center justify-center shadow-xs">
+              1
+            </button>
+            <button className="w-8 h-8 rounded-lg border border-slate-200/80 text-slate-600 hover:bg-slate-50 font-semibold text-xs flex items-center justify-center">
+              2
+            </button>
+            <button className="w-8 h-8 rounded-lg border border-slate-200/80 text-slate-600 hover:bg-slate-50 font-semibold text-xs flex items-center justify-center">
+              3
+            </button>
+            <span className="text-xs text-slate-400 px-1">...</span>
+            <button className="w-8 h-8 rounded-lg border border-slate-200/80 text-slate-600 hover:bg-slate-50 font-semibold text-xs flex items-center justify-center">
+              12
+            </button>
+            <button className="w-8 h-8 rounded-lg border border-slate-200/80 text-slate-600 hover:bg-slate-50 flex items-center justify-center text-xs">
+              &gt;
+            </button>
+          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }

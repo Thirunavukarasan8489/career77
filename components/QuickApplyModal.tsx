@@ -30,8 +30,8 @@ export default function QuickApplyModal({ job, isOpen, onClose }: QuickApplyModa
   // Pre-fill if candidate is logged in
   useEffect(() => {
     if (candidate) {
-      setName(candidate.name);
-      setMobile(candidate.mobile);
+      setName(candidate.name || "");
+      setMobile(candidate.mobile || "");
       if (candidate.resumeUrl) {
         setResumeUrl(candidate.resumeUrl);
         setResumePublicId(candidate.resumePublicId || "");

@@ -5,26 +5,43 @@ import { getToken } from "next-auth/jwt";
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // 1. Recruiter route guards
-  // Protect all /recruiter paths except /recruiter/login and /recruiter/register
+  const token = await getToken({
+    req: request,
+    secret: process.env.NEXTAUTH_SECRET,
+  });
+
+  // 1. Candidate routes protection (/candidate/* or legacy /dashboard/*)
+  if (pathname.startsWith("/candidate") || pathname.startsWith("/dashboard")) {
+    const candidateCookie = request.cookies.get("candidate_session")?.value;
+    const isCandidateNextAuth = token && token.role === "candidate";
+
+    if (!candidateCookie && !isCandidateNextAuth) {
+      const loginUrl = new URL("/login", request.url);
+      return NextResponse.redirect(loginUrl);
+    }
+  }
+
+  // 2. Recruiter routes protection (/recruiter/*)
   if (pathname.startsWith("/recruiter") && pathname !== "/recruiter/login" && pathname !== "/recruiter/register") {
-    const token = await getToken({
-      req: request,
-      secret: process.env.NEXTAUTH_SECRET,
-    });
     if (!token) {
+      const loginUrl = new URL("/recruiter/login", request.url);
+      return NextResponse.redirect(loginUrl);
+    }
+    // Cross-role guard: ensure token role is recruiter or superadmin
+    if (token.role && token.role !== "recruiter" && token.role !== "superadmin") {
       const loginUrl = new URL("/recruiter/login", request.url);
       return NextResponse.redirect(loginUrl);
     }
   }
 
-  // 2. Candidate route guards
-  // Protect all /dashboard paths
-  // We check only for the presence of the cookie to keep middleware 100% Edge-compatible
-  if (pathname.startsWith("/dashboard")) {
-    const candidateCookie = request.cookies.get("candidate_session")?.value;
-    if (!candidateCookie) {
-      const loginUrl = new URL("/login", request.url);
+  // 3. Super Admin routes protection (/admin/*)
+  if (pathname.startsWith("/admin") && pathname !== "/admin/login") {
+    if (!token) {
+      const loginUrl = new URL("/admin/login", request.url);
+      return NextResponse.redirect(loginUrl);
+    }
+    if (token.role !== "superadmin") {
+      const loginUrl = new URL("/admin/login", request.url);
       return NextResponse.redirect(loginUrl);
     }
   }
@@ -32,7 +49,6 @@ export async function middleware(request: NextRequest) {
   return NextResponse.next();
 }
 
-// Define matching paths to trigger middleware
 export const config = {
-  matcher: ["/dashboard/:path*", "/recruiter/:path*"],
+  matcher: ["/candidate/:path*", "/dashboard/:path*", "/recruiter/:path*", "/admin/:path*"],
 };

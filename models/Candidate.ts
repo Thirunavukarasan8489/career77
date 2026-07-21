@@ -1,28 +1,40 @@
-import mongoose, { Schema, model, models } from "mongoose";
+import mongoose, { Schema, Document, Model } from "mongoose";
 
-export interface ICandidate {
-  _id: mongoose.Types.ObjectId | string;
+export interface ICandidate extends Document {
+  userId?: mongoose.Types.ObjectId;
   name: string;
-  mobile: string;
-  email?: string;
+  email: string;
+  mobile?: string;
   experience?: string;
   city?: string;
   skills: string[];
-  lookingFor: string;
-  resumeUrl?: string; // Cloudinary secure_url
-  resumePublicId?: string; // Cloudinary public_id
+  lookingFor?: string;
+  bio?: string;
+  resumeUrl?: string;
+  resumePublicId?: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-const CandidateSchema = new Schema<ICandidate>({
-  name: { type: String, required: true },
-  mobile: { type: String, required: true, unique: true },
-  email: { type: String },
-  experience: { type: String },
-  city: { type: String },
-  skills: [{ type: String }],
-  lookingFor: { type: String, required: true },
-  resumeUrl: { type: String },
-  resumePublicId: { type: String },
-});
+const CandidateSchema = new Schema<ICandidate>(
+  {
+    userId: { type: Schema.Types.ObjectId, ref: "User" },
+    name: { type: String, required: true },
+    email: { type: String, required: true, lowercase: true, trim: true },
+    mobile: { type: String },
+    experience: { type: String },
+    city: { type: String },
+    skills: [{ type: String }],
+    lookingFor: { type: String },
+    bio: { type: String },
+    resumeUrl: { type: String },
+    resumePublicId: { type: String },
+  },
+  { timestamps: true }
+);
 
-export const Candidate = models.Candidate || model<ICandidate>("Candidate", CandidateSchema);
+CandidateSchema.index({ email: 1 });
+CandidateSchema.index({ userId: 1 });
+
+export const Candidate: Model<ICandidate> =
+  mongoose.models.Candidate || mongoose.model<ICandidate>("Candidate", CandidateSchema);
