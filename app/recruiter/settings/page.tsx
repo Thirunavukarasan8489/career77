@@ -13,9 +13,9 @@ export default function RecruiterSettingsPage() {
   };
 
   return (
-    <div className="bg-slate-800 border border-slate-700 rounded-2xl p-6 sm:p-8 shadow-xl space-y-6">
-      <div className="border-b border-slate-700 pb-5">
-        <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-white">
+    <div className=" border-slate-700 space-y-6">
+      <div className="border-b border-slate-300 pb-5">
+        <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-slate-900">
           Recruiter Settings
         </h1>
         <p className="text-slate-400 text-sm mt-1">
@@ -25,9 +25,9 @@ export default function RecruiterSettingsPage() {
 
       <form onSubmit={handleSave} className="space-y-6">
         <div className="space-y-4">
-          <div className="flex items-center justify-between p-4 bg-slate-900 rounded-xl border border-slate-700">
+          <div className="flex items-center justify-between p-4 bg-white rounded-xl border border-slate-300">
             <div>
-              <h4 className="font-bold text-white text-sm">New Application Alerts</h4>
+              <h4 className="font-bold text-slate-900 text-sm">New Application Alerts</h4>
               <p className="text-xs text-slate-400">Receive instant email when a candidate applies to your job</p>
             </div>
             <input
@@ -38,9 +38,9 @@ export default function RecruiterSettingsPage() {
             />
           </div>
 
-          <div className="flex items-center justify-between p-4 bg-slate-900 rounded-xl border border-slate-700">
+          <div className="flex items-center justify-between p-4 bg-white rounded-xl border border-slate-300">
             <div>
-              <h4 className="font-bold text-white text-sm">Candidate Auto-Match Notifications</h4>
+              <h4 className="font-bold text-slate-900 text-sm">Candidate Auto-Match Notifications</h4>
               <p className="text-xs text-slate-400">Automatically notify matching candidate profiles when a job is posted</p>
             </div>
             <input
@@ -52,7 +52,7 @@ export default function RecruiterSettingsPage() {
           </div>
         </div>
 
-        <div className="pt-4 border-t border-slate-700 flex justify-end">
+        <div className="pt-4 border-t border-slate-300 flex justify-end">
           <button
             type="submit"
             className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg transition-all"
