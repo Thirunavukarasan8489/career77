@@ -2,6 +2,10 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { connectToDatabase } from "@/lib/db";
 import { Job } from "@/models/Job";
+import { Company } from "@/models/Company";
+import { Recruiter } from "@/models/Recruiter";
+import { Candidate } from "@/models/Candidate";
+import { getCandidateSession } from "@/lib/auth";
 import JobDetailInteractive from "@/components/JobDetailInteractive";
 
 export const revalidate = 60;
@@ -55,6 +59,15 @@ export default async function JobDetailPage({ params }: Props) {
 
   if (!job) {
     notFound();
+  }
+
+  const session = await getCandidateSession();
+  let savedJobIds: string[] | undefined = undefined;
+  if (session?.candidateId) {
+    const candidateDoc = await Candidate.findById(session.candidateId).select("savedJobs").lean();
+    if (candidateDoc && candidateDoc.savedJobs) {
+      savedJobIds = candidateDoc.savedJobs.map((id: any) => id.toString());
+    }
   }
 
   if (job.status === "closed") {
@@ -231,12 +244,8 @@ export default async function JobDetailPage({ params }: Props) {
             </div>
 
             {/* Action Buttons */}
-            <div className="pt-2 space-y-3">
-              <JobDetailInteractive job={simpleJob} />
-              <button className="w-full border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-xs py-3 rounded-xl transition-all inline-flex items-center justify-center gap-2">
-                <span>🔖</span>
-                <span>Save Job</span>
-              </button>
+            <div className="pt-2">
+              <JobDetailInteractive job={simpleJob} savedJobIds={savedJobIds} />
             </div>
 
             {/* Friends Work Here Social Proof */}

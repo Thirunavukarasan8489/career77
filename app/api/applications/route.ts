@@ -6,7 +6,7 @@ import { connectToDatabase } from "@/lib/db";
 import { Application } from "@/models/Application";
 import { Candidate } from "@/models/Candidate";
 import { Job } from "@/models/Job";
-import { verifyCandidateSession } from "@/lib/auth";
+import { verifyCandidateSession, getCandidateSession } from "@/lib/auth";
 
 export async function POST(request: Request) {
   try {
@@ -73,9 +73,7 @@ export async function POST(request: Request) {
 export async function GET() {
   try {
     await connectToDatabase();
-    const cookieStore = await cookies();
-    const token = cookieStore.get("candidate_session")?.value;
-    const candSession = token ? verifyCandidateSession(token) : null;
+    const candSession = await getCandidateSession();
 
     // A. Candidate viewing their own applications
     if (candSession) {

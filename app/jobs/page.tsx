@@ -1,5 +1,6 @@
 import { connectToDatabase } from "@/lib/db";
 import { Job, IJob } from "@/models/Job";
+import { Company } from "@/models/Company";
 import OpeningsClient from "@/components/OpeningsClient";
 import Link from "next/link";
 import { Suspense } from "react";

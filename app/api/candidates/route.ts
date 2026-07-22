@@ -4,7 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { connectToDatabase } from "@/lib/db";
 import { Candidate } from "@/models/Candidate";
-import { signCandidateSession, verifyCandidateSession } from "@/lib/auth";
+import { signCandidateSession, verifyCandidateSession, getCandidateSession } from "@/lib/auth";
 
 export async function POST(request: Request) {
   try {
@@ -91,9 +91,7 @@ export async function POST(request: Request) {
 export async function GET() {
   try {
     await connectToDatabase();
-    const cookieStore = await cookies();
-    const token = cookieStore.get("candidate_session")?.value;
-    const session = token ? verifyCandidateSession(token) : null;
+    const session = await getCandidateSession();
 
     if (session) {
       const candidate = await Candidate.findById(session.candidateId);
@@ -105,12 +103,16 @@ export async function GET() {
 
     const nextAuthSession = await getServerSession(authOptions);
     if (nextAuthSession && nextAuthSession.user?.email) {
+      const role = (nextAuthSession.user as any).role;
+      if (role === "superadmin" || role === "recruiter") {
+        const candidates = await Candidate.find({}).sort({ createdAt: -1 }).limit(50);
+        return NextResponse.json({ candidates });
+      }
       const candidate = await Candidate.findOne({ email: nextAuthSession.user.email.toLowerCase() });
       return NextResponse.json({ candidate });
     }
 
-    const candidates = await Candidate.find({}).sort({ createdAt: -1 }).limit(50);
-    return NextResponse.json({ candidates });
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

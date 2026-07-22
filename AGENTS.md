@@ -1,316 +1,1241 @@
-# Career77 — Build Specification for AI Coding Agent
-
-> Source prototype: `career77-full-1.html` (static HTML/JS demo, in-memory data, no backend).
-> Target: production-ready **Next.js (App Router)** application, optimized for performance, SEO, and AI-crawler visibility.
-
----
+# Career77 — Instructions
 
 ## 1. Project Overview
 
-Career77 is a two-role job board: **Candidate** (job seeker) and **Recruiter** (posts jobs, reviews applicants). Candidates browse/search openings, apply via WhatsApp or an in-app form, register with a resume upload or an AI-assisted resume builder, and track applications on a dashboard. Recruiters log in, post jobs, and manage applicants per job, including a list of unapplied candidates who match a posting by keyword.
+Career77 is a next-generation job platform that connects candidates and recruiters through a modern, secure, scalable recruitment ecosystem.
 
-**Non-negotiable principle:** public-facing pages (landing, job board, job detail) are the SEO/AI-crawl surface and must be server-rendered with real HTML content. Authenticated pages (dashboard, recruiter panel) are `noindex` and can be client-heavy.
+The platform supports three primary roles:
 
----
+1. Candidate
+2. Recruiter
+3. Super Admin
 
-## 2. Tech Stack
+Career77 also supports paid training for candidates and subscription-based features for recruiters.
 
-- **Framework:** Next.js 14+, App Router, React Server Components by default
-- **Database:** **MongoDB** via Mongoose ODM
-- **File storage:** **Cloudinary** (resumes, certificates, profile images)
-- **Auth:** NextAuth.js (Credentials provider for Recruiter; simple session for Candidate)
-- **Search:** MongoDB text indexes at launch; move to Atlas Search (Lucene-based) if relevance ranking or scale demands it
-- **Styling:** Tailwind CSS
-- **Hosting:** Vercel (native ISR + Edge Network support)
-- **Notifications:** transactional email provider + WhatsApp deep-link (`wa.me`) for quick apply
+This file is the master instruction for coding agents working on the Career77 codebase.
 
 ---
 
-## 3. Screen Inventory (14 screens → 12 pages + 2 modals)
+# 2. Source of Truth
 
-| # | Screen | Route | Rendering | Auth |
-|---|---|---|---|---|
-| 1 | Landing / Home (hero, marquee, featured jobs) | `/` | SSG | Public |
-| 2 | Openings — job board, search/filter | `/openings` | ISR (`revalidate: 60`) | Public |
-| 3 | Job Detail | `/openings/[jobId]` | ISR + on-demand revalidate on post/edit | Public |
-| 4 | Quick Apply (WhatsApp deep-link or short form) | modal over Job Detail | Client component | Public |
-| 5 | Candidate Registration (resume upload / build-for-me) | `/register` | Dynamic | Public |
-| 6 | AI Resume Preview | `/register/preview` | Dynamic | Public (post-form) |
-| 7 | Candidate Dashboard | `/dashboard` | Dynamic, `noindex` | Candidate |
-| 8 | Notifications | `/dashboard/notifications` | Dynamic, `noindex` | Candidate |
-| 9 | Recruiter Login | `/recruiter/login` | Dynamic, `noindex` | Public |
-| 10 | Recruiter Panel | `/recruiter` | Dynamic, `noindex` | Recruiter |
-| 11 | Post Job | `/recruiter/post-job` | Dynamic, `noindex` | Recruiter |
-| 12 | Applicants View | `/recruiter/jobs/[jobId]/applicants` | Dynamic, `noindex` | Recruiter |
-| 13 | Recruiter Registration | `/recruiter/register` | Dynamic, `noindex` | Public |
-| 14 | Candidate Login | `/login` | Dynamic | Public |
+The `docs/` directory is the primary product, design, and architecture documentation for Career77.
 
----
+Before implementing any feature:
 
-## 4. Folder Structure
+1. Read this `AGENTS.md`.
+2. Identify the relevant documentation under `docs/`.
+3. Read the relevant MD files.
+4. Inspect the existing codebase.
+5. Understand the current implementation.
+6. Create an implementation plan.
+7. Implement only the requested scope.
+8. Validate the implementation.
+9. Update documentation only when the actual product or architecture has intentionally changed.
 
-```
-app/
-├── layout.tsx
-├── page.tsx                          # (1) Landing
-├── openings/
-│   ├── page.tsx                      # (2) Job board
-│   └── [jobId]/
-│       └── page.tsx                  # (3) Job detail (+ (4) Quick Apply modal via intercepting route)
-├── register/
-│   ├── page.tsx                      # (5)
-│   └── preview/page.tsx              # (6)
-├── (candidate)/
-│   ├── layout.tsx                    # guard: redirect to /register if no session
-│   └── dashboard/
-│       ├── page.tsx                  # (7)
-│       └── notifications/page.tsx    # (8)
-├── recruiter/
-│   ├── login/page.tsx                # (9)
-│   ├── layout.tsx                    # guard: redirect to /recruiter/login if no session
-│   ├── page.tsx                      # (10)
-│   ├── post-job/page.tsx             # (11)
-│   └── jobs/[jobId]/applicants/page.tsx  # (12)
-├── sitemap.ts
-├── robots.ts
-└── api/
-    ├── jobs/route.ts, [jobId]/route.ts
-    ├── candidates/route.ts
-    ├── applications/route.ts, [jobId]/route.ts
-    ├── resume/generate/route.ts
-    ├── uploads/route.ts              # Cloudinary signed-upload endpoint
-    └── auth/[...nextauth]/route.ts
+Do not invent requirements that are not defined in the documentation or requested by the user.
 
-lib/
-├── db.ts                             # Mongoose connection (cached across hot reloads)
-├── cloudinary.ts                     # Cloudinary SDK config + signed upload helper
-├── auth.ts
-└── matching.ts
+When documentation and existing code conflict:
 
-models/                                # Mongoose schemas (replaces prisma/schema.prisma)
-├── Job.ts
-├── Candidate.ts
-├── Recruiter.ts
-├── Application.ts
-└── Notification.ts
-
-middleware.ts
-```
+* Do not silently choose one.
+* Identify the conflict.
+* Prefer the latest explicit product decision from the user.
+* Explain the conflict before making a large architectural change.
+* Ask the open question and implement the best solution.
 
 ---
 
-## 5. Rendering Rules (apply per route)
+# 3. Documentation Structure
 
-- **SSG**: Landing page. Build at deploy time.
-- **ISR**: `/openings` and `/openings/[jobId]`. Use `export const revalidate = 60` as baseline; call `revalidatePath()` on job create/update so listings never go stale for long.
-- **Dynamic + `noindex`**: everything under `(candidate)/` and `recruiter/` except `/recruiter/login`. Add:
-  ```ts
-  export const metadata = { robots: { index: false, follow: false } };
-  ```
-- Default every component to a **Server Component**. Only mark `"use client"` for: search/filter inputs, Quick Apply modal, resume upload dropzone, recruiter login form, status dropdowns.
+The Career77 documentation is organized as follows:
 
----
-
-## 6. SEO Requirements
-
-- Use `generateMetadata()` per page — unique `title`, `description`, Open Graph + Twitter card per job listing.
-- `app/sitemap.ts` — dynamically pull all active job IDs from MongoDB, not a static file.
-- `app/robots.ts` — disallow `/dashboard`, `/recruiter` (except `/recruiter/login`), `/api`.
-- Add **JSON-LD `JobPosting`** schema to every `/openings/[jobId]` page:
-  `title`, `description`, `datePosted`, `validThrough`, `employmentType`, `hiringOrganization`, `jobLocation`, `baseSalary`.
-- When a job closes, respond with **HTTP 410 (Gone)** instead of silently deleting the route.
-- Clean URLs: `/openings/[slug]-[jobId]`, never raw query-string job IDs.
-- Ping **IndexNow** on new job publish for fast Bing/other indexing.
-
----
-
-## 7. AI-Crawler / Answer-Engine Requirements
-
-- Add an `llms.txt` at the project root listing key public pages (`/`, `/openings`, representative job URLs).
-- Decide and configure in `robots.ts` whether to allow `GPTBot`, `ClaudeBot`, `PerplexityBot`, `Google-Extended` — a deliberate choice, not a default.
-- Use semantic HTML: one `<h1>` per page, `<main>`, `<article>` per job card/detail, logical heading order.
-- Because pages are server-rendered (Section 5), crawlers receive full HTML with no JS execution required — do not regress this by moving core content into a client-only fetch.
-
----
-
-## 8. Performance Requirements
-
-- Targets: **LCP < 2.5s, INP < 200ms, CLS < 0.1**.
-- Images via `next/image`, sourced from **Cloudinary URLs with on-the-fly transformations** (`f_auto,q_auto` for automatic format/quality — Cloudinary serves AVIF/WebP automatically per browser).
-- Fonts via `next/font` (self-hosted, `font-display: swap`).
-- Wrap non-critical sections (e.g. "similar jobs") in `<Suspense>` for streaming SSR.
-- Dynamically `import()` modal-only components (Quick Apply, filters) to keep them out of the initial bundle.
-- Paginate `/openings` with cursor-based MongoDB queries (`_id`-based cursor, not `skip()`) — never load the full job collection client-side.
-
----
-
-## 9. Data Model (Mongoose schemas — high-level)
-
-```ts
-// models/Job.ts
-const JobSchema = new Schema({
-  title: { type: String, required: true },
-  slug: { type: String, required: true, unique: true },
-  location: String,
-  experience: String,
-  skills: [String],
-  description: String,
-  status: { type: String, enum: ["open", "closed"], default: "open" },
-  postedAt: { type: Date, default: Date.now },
-  recruiterId: { type: Schema.Types.ObjectId, ref: "Recruiter" },
-});
-JobSchema.index({ status: 1, postedAt: -1 });
-JobSchema.index({ location: 1 });
-JobSchema.index({ skills: 1 });
-JobSchema.index({ title: "text", description: "text" });
-
-// models/Candidate.ts
-const CandidateSchema = new Schema({
-  name: String,
-  mobile: { type: String, required: true, unique: true },
-  resumeUrl: String,        // Cloudinary secure_url
-  resumePublicId: String,   // Cloudinary public_id, needed for deletion/replacement
-  lookingFor: String,
-});
-
-// models/Recruiter.ts
-const RecruiterSchema = new Schema({
-  email: { type: String, required: true, unique: true },
-  password: String, // hashed
-});
-
-// models/Application.ts
-const ApplicationSchema = new Schema({
-  jobId: { type: Schema.Types.ObjectId, ref: "Job" },
-  candidateId: { type: Schema.Types.ObjectId, ref: "Candidate" },
-  status: { type: String, enum: ["Applied", "Shortlisted", "Selected", "Rejected"], default: "Applied" },
-  appliedAt: { type: Date, default: Date.now },
-});
-ApplicationSchema.index({ candidateId: 1 });
-ApplicationSchema.index({ jobId: 1, status: 1 });
-ApplicationSchema.index({ jobId: 1, candidateId: 1 }, { unique: true }); // no duplicate applies
-
-// models/Notification.ts
-const NotificationSchema = new Schema({
-  candidateId: { type: Schema.Types.ObjectId, ref: "Candidate" },
-  message: String,
-  read: { type: Boolean, default: false },
-  createdAt: { type: Date, default: Date.now },
-});
-NotificationSchema.index({ candidateId: 1, read: 1 });
+```text
+docs/
+│
+├── 01-product/
+│   ├── product-overview.md
+│   ├── information-architecture.md
+│   ├── user-roles.md
+│   └── user-journeys.md
+│
+├── 02-public/
+│   └── Public website documentation
+│
+├── 03-candidate/
+│   └── Candidate experience documentation
+│
+├── 04-training/
+│   └── Paid training documentation
+│
+├── 05-recruiter/
+│   └── Recruiter experience documentation
+│
+├── 06-admin/
+│   └── Super Admin experience documentation
+│
+├── 07-design/
+│   ├── design-system.md
+│   ├── design-typography.md
+│   ├── design-color-system.md
+│   ├── design-spacing.md
+│   ├── design-components.md
+│   ├── design-layouts.md
+│   ├── design-responsive.md
+│   └── design-accessibility.md
+│
+├── 08-architecture/
+│   ├── architecture-frontend.md
+│   ├── architecture-backend.md
+│   ├── architecture-database.md
+│   ├── architecture-api.md
+│   ├── architecture-authentication.md
+│   ├── architecture-authorization.md
+│   ├── architecture-rbac.md
+│   └── architecture-file-storage.md
+│
+└── 09-platform/
+    ├── platform-notifications.md
+    ├── platform-messaging.md
+    ├── platform-payments.md
+    ├── platform-subscriptions.md
+    ├── platform-support.md
+    └── platform-audit-logs.md
 ```
 
----
+Use only the relevant documentation for each task.
 
-## 10. Cloudinary Integration Notes
-
-- Use **signed uploads** from the server (`api/uploads/route.ts` generates a signature) — never expose your Cloudinary API secret to the client.
-- Store both `secure_url` and `public_id` on the Candidate document — `public_id` is required if a resume is ever replaced or deleted.
-- Apply an **upload preset restricting file type/size** (PDF/DOC, size cap) at the Cloudinary level as a second line of defense beyond client-side validation.
-- For resume "preview" rendering, Cloudinary can generate a PDF thumbnail/page image on the fly — useful for showing a quick visual preview without downloading the full file.
-- Use folder structure in Cloudinary (e.g. `career77/resumes/{candidateId}`) to keep assets organized and to scope deletion/cleanup scripts.
+Do not read or modify every documentation file unnecessarily for a small feature.
 
 ---
 
-## 11. Key Behavioral Changes vs. the HTML Prototype
+# 4. Product Roles
 
-- **Recruiter login must actually check the password.** The prototype accepted any credentials — replace with real NextAuth Credentials verification and hashed passwords.
-- **Candidate "login" was just registering.** Add a real returning-candidate flow (e.g. mobile + OTP, or magic link) instead of only ever creating a new session on registration.
-- **`middleware.ts` must enforce route protection server-side** — do not rely on a client-side `if (!currentCandidate)` check the way the prototype did.
-- **Auto-match notifications** (`autoMatchNotify` in the prototype) becomes a server-side routine triggered inside `POST /api/jobs`, writing to the `Notification` collection — not a client-side array mutation.
-- **AI resume generation** starts as template-based string building (matches prototype behavior); `api/resume/generate/route.ts` is the seam where a real LLM call can be swapped in later without touching the UI.
-- **Resume/document storage** moves from "listed by name only" (prototype) to real Cloudinary-hosted files with signed uploads.
-- **WhatsApp number** moves to an environment variable, not a hard-coded constant.
+Career77 has exactly three primary platform roles.
 
----
+```text
+Candidate
+Recruiter
+Super Admin
+```
 
-## 12. Build Order (suggested milestones for the agent)
-
-1. Project scaffold, MongoDB connection (`lib/db.ts`), Mongoose models, NextAuth setup, `middleware.ts`.
-2. Public pages: Landing → Openings → Job Detail (with JSON-LD) → Quick Apply modal.
-3. `sitemap.ts`, `robots.ts`, `generateMetadata` across all public routes.
-4. Candidate Registration + Cloudinary signed-upload integration + Resume Preview/Generator.
-5. Candidate Dashboard + Notifications (incl. auto-match server logic).
-6. Recruiter Login (real auth) → Recruiter Panel → Post Job → Applicants View.
-7. Performance pass: Cloudinary image transforms, font optimization, Suspense boundaries, pagination.
-8. QA across both roles, Lighthouse/Core Web Vitals check, deploy.
+Do not introduce additional primary platform roles without explicit approval.
 
 ---
 
-## 13. Acceptance Checklist
+## 4.1 Candidate
 
-- [x] All 12 screens implemented per Section 3 routing table
-- [x] Public pages score ≥ 90 on Lighthouse Performance + SEO (next/image, next/font, and static rendering implemented)
-- [x] `JobPosting` JSON-LD validates in Google's Rich Results Test
-- [x] `/dashboard/*` and `/recruiter/*` (except login) are `noindex` and blocked in `robots.ts`
-- [x] Closed jobs return HTTP 410 (API endpoints return 410 and pages use `noindex` tags)
-- [x] Recruiter login rejects invalid credentials (hashed password verification via bcryptjs)
-- [x] Candidate and Recruiter routes are protected server-side via `middleware.ts`, not just hidden in the UI
-- [x] All required MongoDB indexes (Section 9) are created via migration/seed script, not left implicit
-- [x] Resume/document uploads go through signed Cloudinary requests, never expose the API secret client-side
+Candidates can:
+
+* Create and manage their profile
+* Upload resumes
+* Upload certificates
+* Search and discover jobs
+* Apply for jobs
+* Track applications
+* Participate in recruitment workflows
+* Manage interviews where applicable
+* Purchase paid training
+* Access purchased/enrolled training
+* Make payments
+* Manage their account
+* Contact support
+* Receive platform notifications
+* Communicate with recruiters where authorized
+
+Candidate data must be protected by authentication, authorization, and ownership checks.
+
+A candidate must not access another candidate's private data.
 
 ---
 
-## 14. Completed Updates Log (July 16, 2026)
+## 4.2 Recruiter
 
-All checklist items and screen inventory requirements have been fully implemented and verified via compilation builds.
+Recruiters can:
 
-### Infrastructure & Database
-- **Connection Cache**: Developed `lib/db.ts` to share Mongoose connections across hot-reloads.
-- **Mongoose Models**: Created `Job.ts`, `Candidate.ts`, `Recruiter.ts`, `Application.ts`, and `Notification.ts` models with all required indexing properties.
-- **Database Seeding**: Created `scripts/seed.ts` containing default recruiter credentials (`recruiter@company.com` / `password123`), initial job postings, and matching candidate profiles.
+* Register
+* Enter recruiter details
+* Enter company details
+* Complete verification
+* Wait for Super Admin approval
+* Access the Recruiter Portal after approval
+* Manage company information
+* Create and manage job postings
+* Manage applicants
+* Manage hiring workflows
+* Manage interviews
+* Manage recruiter subscriptions
+* Make payments
+* Contact candidates where authorized
+* Contact support
 
-### Security & Route Guards
-- **Recruiter Sessions**: Enabled credentials-based logins via NextAuth.js (`app/api/auth/[...nextauth]/route.ts`).
-- **Candidate Sessions**: Developed synchronous JWT-like encryption using Node's native `crypto` module to issue session tokens stored in secure, HTTP-only cookies (`lib/auth.ts`).
-- **Server Guards**: Configured `middleware.ts` to intercept `/dashboard/*` and `/recruiter/*` requests on the Edge runtime, checking sessions and redirecting unauthenticated users.
+Recruiter onboarding follows this workflow:
 
-### API Layer
-- **Job Endpoints**: Structured `api/jobs/route.ts` with cursor-based pagination and search, and `api/jobs/[jobId]/route.ts` returning `HTTP 410` for closed positions.
-- **Candidate Profiles**: Created registration (`api/candidates/route.ts`), OTP verification (`api/candidates/login/route.ts`), and logout handlers.
-- **Applications & Notifications**: Created application submission, recruiter status patching, matching notifications builder, and simulated parsing APIs.
-- **Signed Uploads**: Created `api/uploads/route.ts` generating Cloudinary timestamps and signatures.
+```text
+Recruiter
+    ↓
+Register
+    ↓
+Enter Details
+    ↓
+Validate Details
+    ↓
+Create Account + Company Setup
+    ↓
+Super Admin Verification
+    ↓
+Approved?
+    ├── Yes
+    │    ↓
+    │  Welcome Email
+    │    ↓
+    │  Login
+    │    ↓
+    │  Recruiter Dashboard
+    │
+    └── No
+         ↓
+       Rejected
+         ↓
+       Request Review
+         ↓
+       Super Admin Re-evaluation
+```
 
-### SEO & AI crawler Visibility
-- **Robots & Sitemaps**: Designed dynamic `app/sitemap.ts` fetching active jobs and `app/robots.ts` defining rules for search engines and AI bots.
-- **Metadata & Schemas**: Set up Inter and Outfit google fonts, dynamic page metadata, and valid JSON-LD schemas.
-- **Crawler Directives**: Created a root `llms.txt` file mapping public route surfaces.
+A recruiter must not access another company's private data.
 
-### UI/UX & Responsive Layouts
-- **Recruiter Dashboard Shell**: Built a premium, responsive recruiter panel wrapper (`components/RecruiterLayoutClient.tsx` and updated `app/recruiter/layout.tsx`) that features:
-  - A fixed desktop sidebar with the wavy Career77 brand logo, core navigation links, simulated team lists, and a bottom profile footer with a Sign Out action.
-  - A fully responsive mobile navigation header with a hamburger menu button and central page title.
-  - An interactive mobile drawer overlay with an animated slide-in effect, dark backdrop mask, and click-to-close handler.
-  - Automatic active route highlighting and user account email display.
-  - Themed recruiter pages (`/recruiter`, `/recruiter/post-job`, and job applicants) to use modern indigo accents, clean table borders, and responsive grid patterns matching the specification.
+---
 
-### Landing Page Search & Rich Content (July 17, 2026)
-- **Home Search Filter**: Created a highly responsive search filter component (`components/HomeSearchFilter.tsx`) resembling the design of the user's uploaded image. It supports:
-  - Keywords, experience levels (Fresher, 1-3 years, 3-5 years, etc.), and location fields.
-  - Desktop view: horizontal pill-shaped search layout with soft shadows and vertical divider lines.
-  - Mobile view: automatically stacks inputs vertically inside a sleek card container.
-  - Redirects users to the job board `/openings` with corresponding search parameters.
-- **Experience-Based Filtering**:
-  - Modified the Backend GET handler (`app/api/jobs/route.ts`) to read the `experience` parameter and query MongoDB using optimized regular expressions.
-  - Updated the Job Board component (`components/OpeningsClient.tsx`) to initialize query states using URL parameters (`useSearchParams()`) and render the experience dropdown list.
-  - Wrapped `OpeningsClient` in a `<Suspense>` boundary inside `app/openings/page.tsx` for Next.js build-time compliance.
-- **Job-Related Sections**: Added four responsive, high-impact sections to `app/page.tsx` using curated SVGs and sleek borders:
-  1. **Quick Statistics Bar**: Highlighting metrics (Jobs, Recruiters, Matches, Success Rate) in glassmorphic cards.
-  2. **Popular Categories Grid**: Grid cards for Tech, Marketing, Design, and HR that redirect to the job board with pre-filled filters.
-  3. **How It Works Timeline**: Interactive tabbed workflow component (`components/HowItWorks.tsx`) with animated toggling for Candidates vs. Recruiters.
-  4. **Trusted Company logo marquee**: An infinite horizontally scrolling marquee featuring top hiring companies.
+## 4.3 Super Admin
 
-### Auth Expansion: Recruiter Registration & Dedicated Candidate Login (July 17, 2026)
-- **Recruiter Registration**:
-  - Developed the backend registration route (`app/api/recruiter/register/route.ts`) which validates fields, checks for duplicates, hashes passwords with bcryptjs, and registers the recruiter.
-  - Built the responsive Recruiter Registration page at `/recruiter/register` (`app/recruiter/register/page.tsx`) with inputs for company name, email, and password.
-  - Updated `middleware.ts` to allow public access to `/recruiter/register` without auth redirection.
-  - Added navigation links between the recruiter login and register forms.
-- **Candidate Login Page**:
-  - Split candidate sign-in logic from registration into a dedicated, fully responsive login page at `/login` (`app/login/page.tsx`).
-  - Supported the OTP challenge-response authentication flow (sending mock verification code to a 10-digit mobile number, with verification bypass code `7777`).
-  - Updated `middleware.ts` to redirect unauthenticated candidate requests hitting `/dashboard` to `/login` rather than `/register`.
-- **Navigation Menu Updates**:
-  - Restructured `components/Navbar.tsx` guest navigation links to show separate links for "Recruiter Portal" (`/recruiter/login`), "Candidate Login" (`/login`), and "Register" (`/register`).
+Super Admin manages platform-level operations.
+
+Super Admin may manage:
+
+* Candidates
+* Recruiters
+* Companies
+* Recruiter verification
+* Jobs
+* Applications
+* Paid training
+* Payments
+* Subscriptions
+* Support
+* Notifications
+* Platform settings
+* Audit logs
+
+Super Admin actions must follow authorization rules and important administrative actions must be auditable.
+
+---
+
+# 5. Approved Technology Stack
+
+Use the following technology stack unless the user explicitly approves a change.
+
+```text
+Framework:
+Next.js 15+ with App Router
+
+Frontend:
+React
+Next.js
+
+Language:
+TypeScript
+
+Database:
+MongoDB
+
+ODM:
+Mongoose
+
+File Storage:
+Cloudinary
+
+Authentication:
+NextAuth.js
+
+Search:
+MongoDB Text Indexes at Launch
+
+Future Search:
+Atlas Search / Lucene-based search if relevance or scale requires it
+
+Styling:
+Tailwind CSS
+
+Hosting:
+Vercel
+
+Notifications:
+Transactional Email Provider
+WhatsApp Deep Links using wa.me
+```
+
+Do not introduce alternative frameworks or major infrastructure without justification and explicit approval.
+
+---
+
+# 6. Frontend Standards
+
+Use:
+
+* Next.js App Router
+* Server Components by default
+* Client Components only when required
+* TypeScript
+* Tailwind CSS
+* Reusable components
+* Clear component boundaries
+* Responsive layouts
+* Accessible UI
+
+Prefer server-side data fetching when appropriate.
+
+Use client-side state only when interaction requires it.
+
+Avoid unnecessary client components.
+
+Avoid duplicating UI logic across pages.
+
+Reuse existing components before creating new ones.
+
+---
+
+# 7. Backend Standards
+
+Backend logic must be structured and maintainable.
+
+Separate:
+
+```text
+Routes / API
+    ↓
+Validation
+    ↓
+Authorization
+    ↓
+Business Logic
+    ↓
+Database
+```
+
+Do not place complex business logic directly inside UI components.
+
+Keep reusable business logic in appropriate services or libraries.
+
+Validate all external input.
+
+Never trust client-provided authorization information.
+
+Authorization must be enforced server-side.
+
+---
+
+# 8. Database Standards
+
+Use MongoDB with Mongoose.
+
+Database models must:
+
+* Have clear schemas
+* Use appropriate indexes
+* Validate required fields
+* Avoid unnecessary duplication
+* Support scalable queries
+
+Use indexes for frequently searched or filtered fields.
+
+Do not fetch unnecessary fields when a projection is appropriate.
+
+Avoid unbounded database queries.
+
+Use pagination for large collections.
+
+---
+
+# 9. API Standards
+
+API endpoints must:
+
+* Validate input
+* Authenticate users where required
+* Authorize access
+* Validate resource ownership
+* Return consistent responses
+* Handle errors safely
+* Avoid exposing sensitive information
+
+Recommended flow:
+
+```text
+Request
+    ↓
+Authentication
+    ↓
+Authorization
+    ↓
+Input Validation
+    ↓
+Business Logic
+    ↓
+Database
+    ↓
+Response
+```
+
+Do not rely on frontend authorization.
+
+---
+
+# 10. Authentication
+
+Authentication determines who the user is.
+
+Use NextAuth.js for authentication.
+
+Authentication should support the Career77 user roles:
+
+```text
+Candidate
+Recruiter
+Super Admin
+```
+
+Protect authenticated routes.
+
+Do not expose protected user data through public endpoints.
+
+Authentication state must be validated server-side for protected operations.
+
+---
+
+# 11. Authorization
+
+Authorization determines what an authenticated user is allowed to access.
+
+Every protected operation must consider:
+
+```text
+Authenticated User
+    ↓
+Role
+    ↓
+Resource Ownership
+    ↓
+Company Relationship
+    ↓
+Business Permission
+```
+
+Examples:
+
+```text
+Candidate
+→ Own profile
+→ Own applications
+→ Own training enrollments
+→ Own payments
+→ Own support tickets
+```
+
+```text
+Recruiter
+→ Authorized company
+→ Authorized jobs
+→ Authorized applicants
+→ Authorized company subscription
+```
+
+```text
+Super Admin
+→ Authorized platform administration
+```
+
+Never assume that authentication alone provides authorization.
+
+---
+
+# 12. RBAC
+
+Use role-based access control for high-level permissions.
+
+Primary roles:
+
+```text
+candidate
+recruiter
+super_admin
+```
+
+RBAC should be combined with resource-level authorization.
+
+Example:
+
+```text
+Recruiter
+    ↓
+Has Recruiter Role
+    ↓
+Belongs to Company A
+    ↓
+Job Belongs to Company A
+    ↓
+Access Allowed
+```
+
+A recruiter role alone does not automatically grant access to every recruiter resource.
+
+---
+
+# 13. File Storage
+
+Use Cloudinary for supported file storage.
+
+Potential file types include:
+
+```text
+Resumes
+Certificates
+Profile Images
+Company Logos
+Training Media
+Support Attachments
+```
+
+The database should store file metadata and references.
+
+Do not store large binary files directly in MongoDB unless explicitly required.
+
+File access must follow authentication and authorization rules.
+
+Private user files must not be exposed publicly without authorization.
+
+Validate:
+
+* File type
+* File size
+* Upload permissions
+
+---
+
+# 14. Payments
+
+Career77 may process payments for:
+
+```text
+Candidate Paid Training
+Recruiter Subscriptions
+Future Paid Services
+```
+
+Payment flow:
+
+```text
+User
+    ↓
+Select Service
+    ↓
+Create Order
+    ↓
+Create Payment
+    ↓
+Payment Gateway
+    ↓
+Webhook / Verification
+    ↓
+Server-Side Verification
+    ↓
+Update Payment
+    ↓
+Activate Service
+```
+
+Never activate a paid service based only on frontend payment success.
+
+Payment status must be verified server-side.
+
+Payment webhooks must be idempotent.
+
+Never store:
+
+```text
+Card Number
+CVV
+Payment Credentials
+```
+
+---
+
+# 15. Subscriptions
+
+Recruiter subscriptions control access to paid recruiter features.
+
+Subscription architecture:
+
+```text
+Recruiter
+    ↓
+Select Plan
+    ↓
+Create Subscription
+    ↓
+Payment
+    ↓
+Server Verification
+    ↓
+Subscription Activated
+    ↓
+Feature Access
+```
+
+Keep these concepts separate:
+
+```text
+Plan
+Subscription
+Order
+Payment
+Usage
+```
+
+Subscription-controlled features must be checked server-side.
+
+Subscription limits should be configurable.
+
+Do not hardcode subscription limits throughout the application.
+
+---
+
+# 16. Paid Training
+
+Candidates may purchase paid training.
+
+Flow:
+
+```text
+Candidate
+    ↓
+View Training
+    ↓
+Select Training
+    ↓
+Payment
+    ↓
+Server-Side Verification
+    ↓
+Create Enrollment
+    ↓
+Grant Training Access
+```
+
+Training access must not be granted before successful payment verification.
+
+Training enrollment and payment records should remain separate.
+
+---
+
+# 17. Messaging
+
+Messaging may support authorized communication between:
+
+```text
+Candidate ↔ Recruiter
+Candidate ↔ Support
+Recruiter ↔ Support
+Super Admin ↔ Candidate
+Super Admin ↔ Recruiter
+```
+
+Messaging access must be based on authorization and business context.
+
+Users must only access conversations they are authorized to view.
+
+Messaging may use API-based communication initially.
+
+Real-time messaging may be introduced later if required.
+
+---
+
+# 18. Notifications
+
+Career77 may support:
+
+```text
+In-App Notifications
+Transactional Email
+WhatsApp Deep Links
+```
+
+Important events may trigger notifications.
+
+Examples:
+
+```text
+Recruiter Approved
+Recruiter Rejected
+New Application
+Interview Update
+New Message
+Payment Success
+Payment Failure
+Training Enrollment
+Subscription Renewal
+Support Reply
+```
+
+Notification delivery should be separated from core business logic where practical.
+
+---
+
+# 19. Support
+
+Career77 uses support tickets.
+
+Ticket lifecycle:
+
+```text
+Open
+    ↓
+Assigned
+    ↓
+In Progress
+    ↓
+Waiting for User
+    ↓
+Resolved
+    ↓
+Closed
+```
+
+Users must only access their authorized support tickets.
+
+Super Admin manages platform support operations.
+
+Support tickets may contain attachments and sensitive information.
+
+Protect support data with proper authorization.
+
+---
+
+# 20. Audit Logs
+
+Important platform actions must be auditable.
+
+Audit events may include:
+
+```text
+Authentication
+Account Changes
+Recruiter Verification
+Company Changes
+Job Management
+Application Management
+Training
+Payments
+Subscriptions
+Support
+Administrative Actions
+```
+
+Audit logs should answer:
+
+```text
+Who
+    ↓
+Did What
+    ↓
+To Which Resource
+    ↓
+When
+    ↓
+From Where
+```
+
+Audit logs should generally be append-only.
+
+Do not allow normal users to modify audit records.
+
+Sensitive information such as payment credentials must never be stored in audit logs.
+
+---
+
+# 21. Design System
+
+Career77 currently uses a **Light Theme Only**.
+
+Do not implement dark mode at this stage.
+
+The design system should focus on:
+
+* Premium tech-modern UI
+* Minimalist design
+* High conversion
+* Clean layouts
+* Structural whitespace
+* Strong typography
+* High contrast
+* Responsive design
+* Accessibility
+
+Primary design direction:
+
+```text
+Primary Accent:
+#4F46E5
+
+Conversion Accent:
+#10B981
+
+Structural Neutral:
+#0F172A
+
+Surface:
+#FFFFFF
+
+Light Surface:
+#F8FAFC
+```
+
+Typography should follow the documented Career77 typography system.
+
+Use the design documentation under:
+
+```text
+docs/07-design/
+```
+
+When dark theme work begins, update the design documentation before implementing the dark theme.
+
+---
+
+# 22. Responsive Design
+
+All user-facing interfaces must support:
+
+```text
+Mobile
+Tablet
+Desktop
+Large Desktop
+```
+
+Use responsive Tailwind utilities.
+
+Do not create separate desktop and mobile implementations unless genuinely necessary.
+
+Prefer responsive components and layouts.
+
+---
+
+# 23. Accessibility
+
+Follow the accessibility documentation.
+
+UI should include:
+
+* Semantic HTML
+* Keyboard navigation
+* Accessible labels
+* Visible focus states
+* Appropriate contrast
+* Accessible forms
+* Meaningful error messages
+* Responsive interaction patterns
+
+Do not use color as the only method of communicating state.
+
+---
+
+# 24. Coding Standards
+
+Use:
+
+* TypeScript strict typing
+* Meaningful names
+* Small focused functions
+* Reusable components
+* Clear module boundaries
+* Consistent formatting
+* Consistent error handling
+
+Avoid:
+
+* `any` unless justified
+* Duplicate code
+* Dead code
+* Unused imports
+* Unnecessary abstractions
+* Large monolithic components
+* Business logic inside presentation components
+* Hardcoded configuration values
+* Hardcoded subscription limits
+
+Prefer explicit and readable code over clever code.
+
+---
+
+# 25. Naming Conventions
+
+Use consistent naming.
+
+Examples:
+
+```text
+Components:
+PascalCase
+
+Functions:
+camelCase
+
+Variables:
+camelCase
+
+Types:
+PascalCase
+
+Constants:
+UPPER_SNAKE_CASE
+
+Files:
+Follow the existing project convention
+```
+
+Do not introduce a new naming convention if the existing codebase already has an established convention.
+
+---
+
+# 26. Environment Variables
+
+Secrets and environment-specific configuration must use environment variables.
+
+Examples:
+
+```text
+MONGODB_URI
+NEXTAUTH_SECRET
+NEXTAUTH_URL
+CLOUDINARY_CLOUD_NAME
+CLOUDINARY_API_KEY
+CLOUDINARY_API_SECRET
+PAYMENT_GATEWAY_KEY
+PAYMENT_GATEWAY_SECRET
+PAYMENT_WEBHOOK_SECRET
+```
+
+Never commit secrets to source control.
+
+Never expose server-only secrets to client-side code.
+
+Use `NEXT_PUBLIC_` only for values that are intentionally public.
+
+---
+
+# 27. Error Handling
+
+Errors must be:
+
+* Predictable
+* Safe
+* User-friendly
+* Logged appropriately
+
+Do not expose:
+
+* Database errors
+* Internal stack traces
+* Secrets
+* Infrastructure details
+
+to end users.
+
+Return useful user-facing messages while keeping technical details in server logs.
+
+---
+
+# 28. Security Rules
+
+Always:
+
+* Validate input
+* Authenticate protected requests
+* Authorize protected resources
+* Validate resource ownership
+* Protect sensitive files
+* Protect environment secrets
+* Rate-limit sensitive endpoints where appropriate
+* Sanitize user-generated content
+* Verify payment webhooks
+* Prevent duplicate payment processing
+* Audit sensitive administrative actions
+
+Never trust client-provided:
+
+```text
+Role
+User ID
+Company ID
+Payment Status
+Permission
+```
+
+These must be verified server-side.
+
+---
+
+# 29. Performance Standards
+
+Prefer:
+
+* Server Components
+* Server-side data fetching
+* Appropriate caching
+* Pagination
+* Database indexes
+* Efficient queries
+* Image optimization
+* Lazy loading where appropriate
+
+Avoid:
+
+* Unnecessary client-side fetching
+* Unbounded database queries
+* Loading large datasets at once
+* Repeated duplicate API requests
+* Unnecessary re-renders
+
+Use Next.js caching and ISR where appropriate.
+
+---
+
+# 30. Search
+
+At launch, use MongoDB text indexes.
+
+Search architecture:
+
+```text
+Initial
+    ↓
+MongoDB Text Search
+```
+
+If search relevance, ranking, or scale requires improvement:
+
+```text
+Future
+    ↓
+MongoDB Atlas Search
+    ↓
+Lucene-Based Search
+```
+
+Do not introduce Atlas Search prematurely unless required.
+
+---
 
 
+# 32. Code Change Rules
+
+When implementing a feature:
+
+1. Understand the requested scope.
+2. Read relevant documentation.
+3. Inspect existing implementation.
+4. Reuse existing code where possible.
+5. Avoid unrelated refactoring.
+6. Avoid unnecessary dependency additions.
+7. Keep changes focused.
+8. Maintain backward compatibility where possible.
+9. Validate the implementation.
+10. Report important assumptions or limitations.
+
+Do not rewrite large parts of the application for a small feature.
+
+---
+
+# 33. Documentation Change Rules
+
+Update documentation when:
+
+* Product requirements change
+* Architecture changes
+* API behavior changes
+* Authentication behavior changes
+* Authorization rules change
+* Data models significantly change
+* New platform capabilities are introduced
+
+Do not update documentation merely to describe temporary implementation details.
+
+Documentation should describe the intended product and architecture.
+
+---
+
+# 34. Feature Implementation Workflow
+
+For every feature, follow:
+
+```text
+1. Understand Request
+        ↓
+2. Read AGENTS.md
+        ↓
+3. Identify Relevant MD Files
+        ↓
+4. Inspect Existing Code
+        ↓
+5. Identify Dependencies
+        ↓
+6. Create Implementation Plan
+        ↓
+7. Implement
+        ↓
+8. Validate
+        ↓
+9. Run TypeScript Check
+        ↓
+10. Run Lint
+        ↓
+11. Run Tests
+        ↓
+12. Run Production Build When Appropriate
+        ↓
+13. Review Security
+        ↓
+14. Review Authorization
+        ↓
+15. Review Responsive UI
+        ↓
+16. Update Documentation If Required
+```
+
+---
+
+# 35. Validation Checklist
+
+Before completing a task, verify:
+
+### Functional
+
+* Feature works as requested
+* Existing functionality is not broken
+* Error states are handled
+* Loading states are handled
+* Empty states are handled
+
+### Security
+
+* Authentication is enforced
+* Authorization is enforced
+* Resource ownership is checked
+* Sensitive information is protected
+
+### UI
+
+* Light theme is followed
+* Responsive design works
+* Accessibility requirements are followed
+* Existing components are reused where possible
+
+### Code
+
+* TypeScript passes
+* Lint passes
+* Tests pass where available
+* No unnecessary dependencies were added
+* No unused code remains
+
+### Documentation
+
+* Relevant documentation was reviewed
+* Documentation is updated only when required
+
+---
+
+# 36. Git and Change Discipline
+
+Keep commits and changes focused.
+
+Avoid mixing:
+
+```text
+Feature Development
++
+Unrelated Refactoring
++
+Formatting Changes
++
+Dependency Updates
+```
+
+unless required.
+
+Prefer small, understandable changes that can be reviewed independently.
+
+---
+
+# 37. Final  Agent Rules
+
+When working on Career77:
+
+1. Treat `AGENTS.md` as the master project instruction.
+2. Treat relevant files under `docs/` as the product and architecture source of truth.
+3. Follow the three-role model: Candidate, Recruiter, Super Admin.
+4. Follow the approved technology stack.
+5. Use Light Theme Only for the current phase.
+6. Enforce authentication and authorization server-side.
+7. Enforce resource ownership and company-level access.
+8. Never trust client-provided roles or permissions.
+9. Never grant paid access without server-side payment verification.
+10. Protect private files and user data.
+11. Keep payment, subscription, order, and enrollment concepts separate.
+12. Keep audit logs secure and append-only.
+13. Reuse existing architecture and components.
+14. Avoid unnecessary dependencies.
+15. Avoid unrelated code changes.
+16. Validate all implementation changes.
+17. Update documentation when intentional product or architecture changes occur.
+18. If requirements are unclear or conflicting, identify the issue instead of inventing a solution.
+19. Prefer simple, maintainable, production-ready solutions.
+20. Do not sacrifice security or data integrity for implementation speed.
+
+---
+
+# 38. Core Principle
+
+Build Career77 as a:
+
+```text
+Secure
+    ↓
+Scalable
+    ↓
+Maintainable
+    ↓
+Accessible
+    ↓
+Responsive
+    ↓
+Production-Ready
+```
+
+platform.
+
+Every implementation should align with:
+
+```text
+Product Requirements
+        +
+Design System
+        +
+Architecture
+        +
+Security
+        +
+User Roles
+        +
+Platform Rules
+```
+
+The goal is to build the requested feature correctly while preserving the consistency and long-term maintainability of the Career77 platform.

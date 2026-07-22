@@ -1,5 +1,8 @@
 import { connectToDatabase } from "@/lib/db";
 import { Job, IJob } from "@/models/Job";
+import { Company } from "@/models/Company"; // Import to register schema
+import { Candidate } from "@/models/Candidate";
+import { getCandidateSession } from "@/lib/auth";
 import OpeningsClient from "@/components/OpeningsClient";
 import { Suspense } from "react";
 
@@ -7,6 +10,15 @@ export const dynamic = "force-dynamic";
 
 export default async function CandidateJobsPage() {
   await connectToDatabase();
+
+  const session = await getCandidateSession();
+  let savedJobIds: string[] = [];
+  if (session?.candidateId) {
+    const candidateDoc = await Candidate.findById(session.candidateId).select("savedJobs").lean();
+    if (candidateDoc && candidateDoc.savedJobs) {
+      savedJobIds = candidateDoc.savedJobs.map((id: any) => id.toString());
+    }
+  }
 
   const rawJobs = await Job.find({ status: "open" })
     .populate("companyId", "name slug logoUrl verified")
@@ -27,7 +39,7 @@ export default async function CandidateJobsPage() {
       </div>
 
       <Suspense fallback={<div className="flex justify-center py-12"><div className="w-8 h-8 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div></div>}>
-        <OpeningsClient initialJobs={initialJobs} />
+        <OpeningsClient initialJobs={initialJobs} savedJobIds={savedJobIds} />
       </Suspense>
     </div>
   );

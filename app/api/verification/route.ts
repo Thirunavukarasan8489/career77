@@ -2,9 +2,16 @@ import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/db";
 import { VerificationRequest } from "@/models/VerificationRequest";
 import { Company } from "@/models/Company";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../auth/[...nextauth]/route";
 
 export async function GET() {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session || (session.user as any).role !== "superadmin") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     await connectToDatabase();
     const requests = await VerificationRequest.find({})
       .populate("companyId", "name slug verified")
@@ -18,6 +25,11 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     await connectToDatabase();
     const body = await request.json();
     const { documentUrl } = body;
@@ -43,6 +55,11 @@ export async function POST(request: Request) {
 
 export async function PATCH(request: Request) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session || (session.user as any).role !== "superadmin") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     await connectToDatabase();
     const body = await request.json();
     const { requestId, status } = body;

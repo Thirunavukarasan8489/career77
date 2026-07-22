@@ -6,9 +6,16 @@ import { Company } from "@/models/Company";
 import { Candidate } from "@/models/Candidate";
 import { Interview } from "@/models/Interview";
 import { VerificationRequest } from "@/models/VerificationRequest";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../auth/[...nextauth]/route";
 
 export async function GET() {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session || (session.user as any).role !== "superadmin") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     await connectToDatabase();
 
     const [

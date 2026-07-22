@@ -2,6 +2,10 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { connectToDatabase } from "@/lib/db";
 import { Job } from "@/models/Job";
+import { Company } from "@/models/Company";
+import { Recruiter } from "@/models/Recruiter";
+import { Candidate } from "@/models/Candidate";
+import { getCandidateSession } from "@/lib/auth";
 import JobDetailInteractive from "@/components/JobDetailInteractive";
 
 export const revalidate = 60; // ISR baseline revalidate every 60 seconds
@@ -64,6 +68,15 @@ export default async function JobDetailPage({ params }: Props) {
 
   if (!job) {
     notFound();
+  }
+
+  const session = await getCandidateSession();
+  let savedJobIds: string[] | undefined = undefined;
+  if (session?.candidateId) {
+    const candidateDoc = await Candidate.findById(session.candidateId).select("savedJobs").lean();
+    if (candidateDoc && candidateDoc.savedJobs) {
+      savedJobIds = candidateDoc.savedJobs.map((id: any) => id.toString());
+    }
   }
 
   const isClosed = job.status === "closed";
@@ -186,7 +199,7 @@ export default async function JobDetailPage({ params }: Props) {
           <div className="whitespace-pre-line">{job.description}</div>
         </div>
 
-        <JobDetailInteractive job={simpleJob} />
+        <JobDetailInteractive job={simpleJob} savedJobIds={savedJobIds} />
       </article>
     </div>
   );

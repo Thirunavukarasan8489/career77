@@ -22,7 +22,12 @@ export async function middleware(request: NextRequest) {
   }
 
   // 2. Recruiter routes protection (/recruiter/*)
-  if (pathname.startsWith("/recruiter") && pathname !== "/recruiter/login" && pathname !== "/recruiter/register") {
+  if (
+    pathname.startsWith("/recruiter") &&
+    pathname !== "/recruiter/login" &&
+    pathname !== "/recruiter/register" &&
+    pathname !== "/recruiter/pending"
+  ) {
     if (!token) {
       const loginUrl = new URL("/recruiter/login", request.url);
       return NextResponse.redirect(loginUrl);
@@ -31,6 +36,11 @@ export async function middleware(request: NextRequest) {
     if (token.role && token.role !== "recruiter" && token.role !== "superadmin") {
       const loginUrl = new URL("/recruiter/login", request.url);
       return NextResponse.redirect(loginUrl);
+    }
+    // Verification check
+    if (token.role === "recruiter" && !token.companyVerified) {
+      const pendingUrl = new URL("/recruiter/pending", request.url);
+      return NextResponse.redirect(pendingUrl);
     }
   }
 

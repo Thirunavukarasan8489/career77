@@ -4,12 +4,14 @@ import { useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { showToast } from "@/components/Toast";
+import SaveJobButton from "@/components/SaveJobButton";
 
 interface OpeningsClientProps {
   initialJobs: any[];
+  savedJobIds?: string[];
 }
 
-export default function OpeningsClient({ initialJobs }: OpeningsClientProps) {
+export default function OpeningsClient({ initialJobs, savedJobIds }: OpeningsClientProps) {
   const searchParams = useSearchParams();
   const queryParam = searchParams.get("query") || "";
   const expParam = searchParams.get("experience") || "";
@@ -263,18 +265,25 @@ export default function OpeningsClient({ initialJobs }: OpeningsClientProps) {
               </div>
 
               <div className="flex sm:flex-col items-center sm:items-end justify-between gap-2 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100">
-                <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    showToast("Job bookmarked!");
-                  }}
-                  className="p-2 text-slate-400 hover:text-blue-600 rounded-lg hover:bg-slate-50 transition-colors"
-                  title="Bookmark Job"
-                >
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                  </svg>
-                </button>
+                {savedJobIds ? (
+                  <SaveJobButton
+                    jobId={job._id}
+                    initialSaved={savedJobIds.includes(job._id)}
+                  />
+                ) : (
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      showToast("Please log in as a candidate to save jobs.");
+                    }}
+                    className="p-2 text-slate-400 hover:text-indigo-600 rounded-lg hover:bg-slate-50 transition-colors"
+                    title="Bookmark Job"
+                  >
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                    </svg>
+                  </button>
+                )}
                 <span className="text-xs font-medium text-slate-400">{job.postedAgo || "Posted 2 hours ago"}</span>
               </div>
             </Link>

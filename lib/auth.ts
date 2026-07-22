@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import { cookies } from "next/headers";
 
 const SECRET = process.env.NEXTAUTH_SECRET || "fallback-secret-for-candidate-auth-77";
 
@@ -40,6 +41,20 @@ export function verifyCandidateSession(token: string): CandidateSession | null {
   try {
     const decoded = Buffer.from(payload, "base64url").toString("utf-8");
     return JSON.parse(decoded) as CandidateSession;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Retrieves and decodes candidate session directly from cookies
+ */
+export async function getCandidateSession(): Promise<CandidateSession | null> {
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("candidate_session")?.value;
+    if (!token) return null;
+    return verifyCandidateSession(token);
   } catch {
     return null;
   }

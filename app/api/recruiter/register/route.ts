@@ -3,6 +3,8 @@ import { connectToDatabase } from "@/lib/db";
 import { Recruiter } from "@/models/Recruiter";
 import bcrypt from "bcryptjs";
 
+import { User } from "@/models/User";
+
 export async function POST(request: Request) {
   try {
     await connectToDatabase();
@@ -27,7 +29,16 @@ export async function POST(request: Request) {
     // Hash password
     const hashedPassword = await bcrypt.hash(password.trim(), 10);
 
+    // 1. Create master User account
+    const user = await User.create({
+      email: email.toLowerCase().trim(),
+      password: hashedPassword,
+      role: "recruiter",
+    });
+
+    // 2. Create Recruiter profile linked to User
     const recruiter = await Recruiter.create({
+      userId: user._id,
       email: email.toLowerCase().trim(),
       password: hashedPassword,
       companyName: companyName.trim(),

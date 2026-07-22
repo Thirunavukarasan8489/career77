@@ -12,6 +12,7 @@ export interface ICandidate extends Document {
   bio?: string;
   resumeUrl?: string;
   resumePublicId?: string;
+  savedJobs?: mongoose.Types.ObjectId[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -29,12 +30,14 @@ const CandidateSchema = new Schema<ICandidate>(
     bio: { type: String },
     resumeUrl: { type: String },
     resumePublicId: { type: String },
+    savedJobs: [{ type: Schema.Types.ObjectId, ref: "Job", default: [] }],
   },
   { timestamps: true }
 );
 
 CandidateSchema.index({ email: 1 });
 CandidateSchema.index({ userId: 1 });
+CandidateSchema.index({ savedJobs: 1 });
 
 export const Candidate: Model<ICandidate> =
   mongoose.models.Candidate || mongoose.model<ICandidate>("Candidate", CandidateSchema);
