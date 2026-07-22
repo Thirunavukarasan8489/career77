@@ -92,6 +92,16 @@ export default function RecruiterLayoutClient({
         </svg>
       ),
     },
+    {
+      name: "Settings",
+      href: "/recruiter/settings",
+      icon: (
+        <svg className="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+      ),
+    },
   ];
 
   const handleLogout = async () => {
@@ -147,11 +157,10 @@ export default function RecruiterLayoutClient({
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`flex items-center gap-3.5 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${
-                    isActive
-                      ? "bg-blue-600 text-white shadow-md shadow-blue-600/25"
-                      : "text-slate-500 hover:text-slate-900 hover:bg-slate-50"
-                  }`}
+                  className={`flex items-center gap-3.5 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${isActive
+                    ? "bg-blue-600 text-white shadow-md shadow-blue-600/25"
+                    : "text-slate-500 hover:text-slate-900 hover:bg-slate-50"
+                    }`}
                 >
                   <span className={isActive ? "text-white" : "text-slate-400 group-hover:text-slate-600"}>
                     {item.icon}
@@ -164,20 +173,19 @@ export default function RecruiterLayoutClient({
 
           {/* Bottom Settings Link */}
           <div className="p-4 border-t border-slate-100">
-            <Link
-              href="/recruiter/settings"
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${
-                pathname === "/recruiter/settings"
-                  ? "bg-blue-600 text-white shadow-md"
-                  : "text-slate-500 hover:text-slate-900 hover:bg-slate-50"
-              }`}
+            <button
+              onClick={handleLogout}
+              className={`flex items-center w-full gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all text-red-500 hover:text-red-900 hover:bg-red-200`}
             >
-              <svg className="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+              {/* <svg className="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg> */}
+              <svg className="w-5 h-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <path d="M15 4H18C19.1046 4 20 4.89543 20 6V18C20 19.1046 19.1046 20 18 20H15M8 8L4 12M4 12L8 16M4 12L16 12" />
               </svg>
-              <span>Settings</span>
-            </Link>
+              <span>Logout</span>
+            </button>
           </div>
         </aside>
 
@@ -216,9 +224,8 @@ export default function RecruiterLayoutClient({
                     <Link
                       key={item.name}
                       href={item.href}
-                      className={`flex items-center gap-3.5 px-4 py-3 rounded-xl text-sm font-semibold ${
-                        isActive ? "bg-blue-600 text-white" : "text-slate-600 hover:bg-slate-50"
-                      }`}
+                      className={`flex items-center gap-3.5 px-4 py-3 rounded-xl text-sm font-semibold ${isActive ? "bg-blue-600 text-white" : "text-slate-600 hover:bg-slate-50"
+                        }`}
                     >
                       {item.icon}
                       <span>{item.name}</span>

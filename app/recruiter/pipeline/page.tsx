@@ -154,12 +154,12 @@ export default function RecruiterPipelinePage() {
     <div className="space-y-6">
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
+        {/* <div>
           <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">Hiring Pipeline</h1>
           <p className="text-xs text-slate-500 font-medium mt-0.5">
             Manage your active candidate journey for Senior Product Designer
           </p>
-        </div>
+        </div> */}
 
         {/* Action Controls */}
         <div className="flex items-center gap-3">

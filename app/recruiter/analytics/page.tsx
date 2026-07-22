@@ -52,7 +52,7 @@ export default function RecruiterAnalyticsPage() {
       {/* Page Title & Timeframe Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">Analytics</h1>
+          {/* <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">Analytics</h1> */}
           <button
             onClick={() => {
               const next = timeframe === "Last 30 Days" ? "Last 90 Days" : "Last 30 Days";

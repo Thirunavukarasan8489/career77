@@ -118,7 +118,7 @@ export default function RecruiterCandidatesPage() {
   return (
     <div className="space-y-6">
       {/* Top Header / Breadcrumb */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      {/* <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-2">
           <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">Applicants</h1>
           <span className="text-slate-400 font-medium text-sm">/</span>
@@ -126,7 +126,7 @@ export default function RecruiterCandidatesPage() {
             Senior UX Designer (ID: #4492)
           </span>
         </div>
-      </div>
+      </div> */}
 
       {/* Main Split Layout: Left Table (~60%) and Right Detail Drawer (~40%) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
