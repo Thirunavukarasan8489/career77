@@ -315,14 +315,16 @@ Validation
     ↓
 Authorization
     ↓
-Business Logic
+Business Logic (server/services)
+    ↓
+Data Access (server/repositories)
     ↓
 Database
 ```
 
 Do not place complex business logic directly inside UI components.
 
-Keep reusable business logic in appropriate services or libraries.
+Keep reusable business logic in appropriate services (`server/services/`) and abstract database interactions using repositories (`server/repositories/`).
 
 Validate all external input.
 
@@ -852,6 +854,7 @@ Do not use color as the only method of communicating state.
 Use:
 
 * TypeScript strict typing
+* Global domain types defined centrally (e.g., in `types/` folder)
 * Meaningful names
 * Small focused functions
 * Reusable components
