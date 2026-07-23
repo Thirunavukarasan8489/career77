@@ -7,7 +7,7 @@ import { showToast } from "@/components/Toast";
 import Link from "next/link";
 
 export default function SuperAdminLoginPage() {
-  const [email, setEmail] = useState("admin@career77.internal");
+  const [email, setEmail] = useState("admin@career77.com");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");

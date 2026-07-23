@@ -36,11 +36,11 @@ Do not invent requirements that are not defined in the documentation or requeste
 
 When documentation and existing code conflict:
 
-* Do not silently choose one.
-* Identify the conflict.
-* Prefer the latest explicit product decision from the user.
-* Explain the conflict before making a large architectural change.
-* Ask the open question and implement the best solution.
+- Do not silently choose one.
+- Identify the conflict.
+- Prefer the latest explicit product decision from the user.
+- Explain the conflict before making a large architectural change.
+- Ask the open question and implement the best solution.
 
 ---
 
@@ -125,21 +125,21 @@ Do not introduce additional primary platform roles without explicit approval.
 
 Candidates can:
 
-* Create and manage their profile
-* Upload resumes
-* Upload certificates
-* Search and discover jobs
-* Apply for jobs
-* Track applications
-* Participate in recruitment workflows
-* Manage interviews where applicable
-* Purchase paid training
-* Access purchased/enrolled training
-* Make payments
-* Manage their account
-* Contact support
-* Receive platform notifications
-* Communicate with recruiters where authorized
+- Create and manage their profile
+- Upload resumes
+- Upload certificates
+- Search and discover jobs
+- Apply for jobs
+- Track applications
+- Participate in recruitment workflows
+- Manage interviews where applicable
+- Purchase paid training
+- Access purchased/enrolled training
+- Make payments
+- Manage their account
+- Contact support
+- Receive platform notifications
+- Communicate with recruiters where authorized
 
 Candidate data must be protected by authentication, authorization, and ownership checks.
 
@@ -151,21 +151,21 @@ A candidate must not access another candidate's private data.
 
 Recruiters can:
 
-* Register
-* Enter recruiter details
-* Enter company details
-* Complete verification
-* Wait for Super Admin approval
-* Access the Recruiter Portal after approval
-* Manage company information
-* Create and manage job postings
-* Manage applicants
-* Manage hiring workflows
-* Manage interviews
-* Manage recruiter subscriptions
-* Make payments
-* Contact candidates where authorized
-* Contact support
+- Register
+- Enter recruiter details
+- Enter company details
+- Complete verification
+- Wait for Super Admin approval
+- Access the Recruiter Portal after approval
+- Manage company information
+- Create and manage job postings
+- Manage applicants
+- Manage hiring workflows
+- Manage interviews
+- Manage recruiter subscriptions
+- Make payments
+- Contact candidates where authorized
+- Contact support
 
 Recruiter onboarding follows this workflow:
 
@@ -210,19 +210,19 @@ Super Admin manages platform-level operations.
 
 Super Admin may manage:
 
-* Candidates
-* Recruiters
-* Companies
-* Recruiter verification
-* Jobs
-* Applications
-* Paid training
-* Payments
-* Subscriptions
-* Support
-* Notifications
-* Platform settings
-* Audit logs
+- Candidates
+- Recruiters
+- Companies
+- Recruiter verification
+- Jobs
+- Applications
+- Paid training
+- Payments
+- Subscriptions
+- Support
+- Notifications
+- Platform settings
+- Audit logs
 
 Super Admin actions must follow authorization rules and important administrative actions must be auditable.
 
@@ -280,15 +280,15 @@ Do not introduce alternative frameworks or major infrastructure without justific
 
 Use:
 
-* Next.js App Router
-* Server Components by default
-* Client Components only when required
-* TypeScript
-* Tailwind CSS
-* Reusable components
-* Clear component boundaries
-* Responsive layouts
-* Accessible UI
+- Next.js App Router
+- Server Components by default
+- Client Components only when required
+- TypeScript
+- Tailwind CSS
+- Reusable components
+- Clear component boundaries
+- Responsive layouts
+- Accessible UI
 
 Prefer server-side data fetching when appropriate.
 
@@ -338,11 +338,11 @@ Use MongoDB with Mongoose.
 
 Database models must:
 
-* Have clear schemas
-* Use appropriate indexes
-* Validate required fields
-* Avoid unnecessary duplication
-* Support scalable queries
+- Have clear schemas
+- Use appropriate indexes
+- Validate required fields
+- Avoid unnecessary duplication
+- Support scalable queries
 
 Use indexes for frequently searched or filtered fields.
 
@@ -358,13 +358,13 @@ Use pagination for large collections.
 
 API endpoints must:
 
-* Validate input
-* Authenticate users where required
-* Authorize access
-* Validate resource ownership
-* Return consistent responses
-* Handle errors safely
-* Avoid exposing sensitive information
+- Validate input
+- Authenticate users where required
+- Authorize access
+- Validate resource ownership
+- Return consistent responses
+- Handle errors safely
+- Avoid exposing sensitive information
 
 Recommended flow:
 
@@ -513,9 +513,9 @@ Private user files must not be exposed publicly without authorization.
 
 Validate:
 
-* File type
-* File size
-* Upload permissions
+- File type
+- File size
+- Upload permissions
 
 ---
 
@@ -768,21 +768,21 @@ Do not implement dark mode at this stage.
 
 The design system should focus on:
 
-* Premium tech-modern UI
-* Minimalist design
-* High conversion
-* Clean layouts
-* Structural whitespace
-* Strong typography
-* High contrast
-* Responsive design
-* Accessibility
+- Premium tech-modern UI
+- Minimalist design
+- High conversion
+- Clean layouts
+- Structural whitespace
+- Strong typography
+- High contrast
+- Responsive design
+- Accessibility
 
 Primary design direction:
 
 ```text
 Primary Accent:
-#4F46E5
+#2536EB
 
 Conversion Accent:
 #10B981
@@ -834,14 +834,14 @@ Follow the accessibility documentation.
 
 UI should include:
 
-* Semantic HTML
-* Keyboard navigation
-* Accessible labels
-* Visible focus states
-* Appropriate contrast
-* Accessible forms
-* Meaningful error messages
-* Responsive interaction patterns
+- Semantic HTML
+- Keyboard navigation
+- Accessible labels
+- Visible focus states
+- Appropriate contrast
+- Accessible forms
+- Meaningful error messages
+- Responsive interaction patterns
 
 Do not use color as the only method of communicating state.
 
@@ -851,25 +851,25 @@ Do not use color as the only method of communicating state.
 
 Use:
 
-* TypeScript strict typing
-* Meaningful names
-* Small focused functions
-* Reusable components
-* Clear module boundaries
-* Consistent formatting
-* Consistent error handling
+- TypeScript strict typing
+- Meaningful names
+- Small focused functions
+- Reusable components
+- Clear module boundaries
+- Consistent formatting
+- Consistent error handling
 
 Avoid:
 
-* `any` unless justified
-* Duplicate code
-* Dead code
-* Unused imports
-* Unnecessary abstractions
-* Large monolithic components
-* Business logic inside presentation components
-* Hardcoded configuration values
-* Hardcoded subscription limits
+- `any` unless justified
+- Duplicate code
+- Dead code
+- Unused imports
+- Unnecessary abstractions
+- Large monolithic components
+- Business logic inside presentation components
+- Hardcoded configuration values
+- Hardcoded subscription limits
 
 Prefer explicit and readable code over clever code.
 
@@ -935,17 +935,17 @@ Use `NEXT_PUBLIC_` only for values that are intentionally public.
 
 Errors must be:
 
-* Predictable
-* Safe
-* User-friendly
-* Logged appropriately
+- Predictable
+- Safe
+- User-friendly
+- Logged appropriately
 
 Do not expose:
 
-* Database errors
-* Internal stack traces
-* Secrets
-* Infrastructure details
+- Database errors
+- Internal stack traces
+- Secrets
+- Infrastructure details
 
 to end users.
 
@@ -957,17 +957,17 @@ Return useful user-facing messages while keeping technical details in server log
 
 Always:
 
-* Validate input
-* Authenticate protected requests
-* Authorize protected resources
-* Validate resource ownership
-* Protect sensitive files
-* Protect environment secrets
-* Rate-limit sensitive endpoints where appropriate
-* Sanitize user-generated content
-* Verify payment webhooks
-* Prevent duplicate payment processing
-* Audit sensitive administrative actions
+- Validate input
+- Authenticate protected requests
+- Authorize protected resources
+- Validate resource ownership
+- Protect sensitive files
+- Protect environment secrets
+- Rate-limit sensitive endpoints where appropriate
+- Sanitize user-generated content
+- Verify payment webhooks
+- Prevent duplicate payment processing
+- Audit sensitive administrative actions
 
 Never trust client-provided:
 
@@ -987,22 +987,22 @@ These must be verified server-side.
 
 Prefer:
 
-* Server Components
-* Server-side data fetching
-* Appropriate caching
-* Pagination
-* Database indexes
-* Efficient queries
-* Image optimization
-* Lazy loading where appropriate
+- Server Components
+- Server-side data fetching
+- Appropriate caching
+- Pagination
+- Database indexes
+- Efficient queries
+- Image optimization
+- Lazy loading where appropriate
 
 Avoid:
 
-* Unnecessary client-side fetching
-* Unbounded database queries
-* Loading large datasets at once
-* Repeated duplicate API requests
-* Unnecessary re-renders
+- Unnecessary client-side fetching
+- Unbounded database queries
+- Loading large datasets at once
+- Repeated duplicate API requests
+- Unnecessary re-renders
 
 Use Next.js caching and ISR where appropriate.
 
@@ -1034,7 +1034,6 @@ Do not introduce Atlas Search prematurely unless required.
 
 ---
 
-
 # 32. Code Change Rules
 
 When implementing a feature:
@@ -1058,13 +1057,13 @@ Do not rewrite large parts of the application for a small feature.
 
 Update documentation when:
 
-* Product requirements change
-* Architecture changes
-* API behavior changes
-* Authentication behavior changes
-* Authorization rules change
-* Data models significantly change
-* New platform capabilities are introduced
+- Product requirements change
+- Architecture changes
+- API behavior changes
+- Authentication behavior changes
+- Authorization rules change
+- Data models significantly change
+- New platform capabilities are introduced
 
 Do not update documentation merely to describe temporary implementation details.
 
@@ -1118,38 +1117,38 @@ Before completing a task, verify:
 
 ### Functional
 
-* Feature works as requested
-* Existing functionality is not broken
-* Error states are handled
-* Loading states are handled
-* Empty states are handled
+- Feature works as requested
+- Existing functionality is not broken
+- Error states are handled
+- Loading states are handled
+- Empty states are handled
 
 ### Security
 
-* Authentication is enforced
-* Authorization is enforced
-* Resource ownership is checked
-* Sensitive information is protected
+- Authentication is enforced
+- Authorization is enforced
+- Resource ownership is checked
+- Sensitive information is protected
 
 ### UI
 
-* Light theme is followed
-* Responsive design works
-* Accessibility requirements are followed
-* Existing components are reused where possible
+- Light theme is followed
+- Responsive design works
+- Accessibility requirements are followed
+- Existing components are reused where possible
 
 ### Code
 
-* TypeScript passes
-* Lint passes
-* Tests pass where available
-* No unnecessary dependencies were added
-* No unused code remains
+- TypeScript passes
+- Lint passes
+- Tests pass where available
+- No unnecessary dependencies were added
+- No unused code remains
 
 ### Documentation
 
-* Relevant documentation was reviewed
-* Documentation is updated only when required
+- Relevant documentation was reviewed
+- Documentation is updated only when required
 
 ---
 
@@ -1175,7 +1174,7 @@ Prefer small, understandable changes that can be reviewed independently.
 
 ---
 
-# 37. Final  Agent Rules
+# 37. Final Agent Rules
 
 When working on Career77:
 

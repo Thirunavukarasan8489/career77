@@ -782,7 +782,7 @@ Primary design direction:
 
 ```text
 Primary Accent:
-#4F46E5
+#2536EB
 
 Conversion Accent:
 #10B981
