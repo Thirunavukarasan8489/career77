@@ -40,11 +40,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         const data = await res.json();
         setCandidate(data.candidate);
 
-        const notifRes = await fetch("/api/notifications");
-        if (notifRes.ok) {
-          const notifData = await notifRes.json();
-          const unread = notifData.notifications.filter((n: any) => !n.read).length;
-          setUnreadCount(unread);
+        if (data.candidate) {
+          const notifRes = await fetch("/api/notifications");
+          if (notifRes.ok) {
+            const notifData = await notifRes.json();
+            const unread = notifData.notifications?.filter((n: any) => !n.read).length || 0;
+            setUnreadCount(unread);
+          }
+        } else {
+          setUnreadCount(0);
         }
       } else {
         setCandidate(null);

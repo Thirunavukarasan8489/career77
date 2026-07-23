@@ -2,6 +2,7 @@ import { Candidate } from "@/models/Candidate";
 import { Application } from "@/models/Application";
 import { Job } from "@/models/Job";
 import { Interview } from "@/models/Interview";
+import { Company } from "@/models/Company";
 import { connectToDatabase } from "@/lib/db";
 
 export class CandidateRepository {
@@ -26,6 +27,7 @@ export class CandidateRepository {
 
   async getDashboardStats(candidateId: string) {
     await connectToDatabase();
+    void Company; // Prevent tree-shaking of the Company model
 
     const activeApplications = await Application.countDocuments({ 
       candidateId, 

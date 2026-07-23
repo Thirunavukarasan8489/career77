@@ -34,7 +34,11 @@ export default function CandidateLayout({ children }: { children: React.ReactNod
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
       </svg>
     )},
-    { name: 'Saved Jobs', href: '/candidate/saved', isChild: true },
+    { name: 'Saved Jobs', href: '/candidate/saved', icon: (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+      </svg>
+    )},
     { name: 'Interviews', href: '/candidate/interviews', icon: (
       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -84,14 +88,10 @@ export default function CandidateLayout({ children }: { children: React.ReactNod
                   isActive 
                     ? 'bg-blue-600 text-white' 
                     : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
-                } ${item.isChild ? 'ml-9 text-xs' : ''}`}
+                } `}
                 onClick={() => setIsSidebarOpen(false)}
               >
-                {!item.isChild && (
-                  <span className={isActive ? 'text-white' : 'text-slate-400'}>
-                    {item.icon}
-                  </span>
-                )}
+                
                 {item.name}
               </Link>
             );

@@ -9,7 +9,6 @@ export async function GET(_req: Request) {
   try {
     let candidateIdStr = '';
     const session = await getServerSession(authOptions);
-
     if (session && session.user && (session.user as any).role === 'candidate') {
       candidateIdStr = (session.user as any).id;
     } else {
@@ -21,7 +20,7 @@ export async function GET(_req: Request) {
     }
 
     if (!candidateIdStr) {
-      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ candidate: null }, { status: 200 });
     }
 
     const candidate = await candidateService.getProfile(candidateIdStr);

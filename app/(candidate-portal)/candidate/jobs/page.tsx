@@ -10,6 +10,7 @@ export const dynamic = "force-dynamic";
 
 export default async function CandidateJobsPage() {
   await connectToDatabase();
+  void Company; // Prevent tree-shaking of the Company model
 
   const session = await getCandidateSession();
   let savedJobIds: string[] = [];
