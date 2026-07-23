@@ -35,7 +35,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const refreshCandidate = async () => {
     try {
-      const res = await fetch("/api/candidates");
+      const res = await fetch("/api/candidate/profile");
       if (res.ok) {
         const data = await res.json();
         setCandidate(data.candidate);
@@ -69,7 +69,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const logoutCandidate = async () => {
     try {
-      await fetch("/api/candidates/logout", { method: "POST" });
+      await fetch("/api/auth/logout", { method: "POST" });
     } catch (e) {
       console.error("Error logging out:", e);
     }

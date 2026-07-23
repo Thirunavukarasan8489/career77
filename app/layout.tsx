@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { Inter, Outfit } from "next/font/google";
 import "./globals.css";
-import { Providers } from "@/components/Providers";
+import { Providers } from "@/components/providers/Providers";
 import { AppProvider } from "@/context/AppContext";
-import LayoutWrapper from "@/components/LayoutWrapper";
+import QueryProvider from "@/components/providers/QueryProvider";
+import LayoutWrapper from "@/components/layout/LayoutWrapper";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -33,11 +34,13 @@ export default function RootLayout({
       className={`${inter.variable} ${outfit.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-slate-50 text-slate-900 font-sans">
-        <Providers>
-          <AppProvider>
-            <LayoutWrapper>{children}</LayoutWrapper>
-          </AppProvider>
-        </Providers>
+        <QueryProvider>
+          <Providers>
+            <AppProvider>
+              <LayoutWrapper>{children}</LayoutWrapper>
+            </AppProvider>
+          </Providers>
+        </QueryProvider>
       </body>
     </html>
   );

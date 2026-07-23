@@ -4,8 +4,7 @@ import { SupportTicket } from "@/models/SupportTicket";
 import { Candidate } from "@/models/Candidate";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/route";
-import { cookies } from "next/headers";
-import { verifyCandidateSession, getCandidateSession } from "@/lib/auth";
+import { getCandidateSession } from "@/lib/auth";
 
 export async function GET() {
   try {

@@ -32,6 +32,12 @@ export const authOptions: NextAuthOptions = {
               if (recruiterDoc) {
                 name = recruiterDoc.companyName || "Recruiter";
               }
+            } else if (user.role === "candidate") {
+              const { Candidate } = await import("@/models/Candidate");
+              const candidateDoc = await Candidate.findOne({ userId: user._id });
+              if (candidateDoc && candidateDoc.name) {
+                name = candidateDoc.name;
+              }
             }
             return {
               id: user._id.toString(),

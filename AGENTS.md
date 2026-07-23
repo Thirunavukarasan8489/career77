@@ -1239,3 +1239,7 @@ Platform Rules
 ```
 
 The goal is to build the requested feature correctly while preserving the consistency and long-term maintainability of the Career77 platform.
+
+# 39. Middleware Convention
+
+The "middleware" file convention is deprecated. Always use "proxy.ts" instead of "middleware.ts".

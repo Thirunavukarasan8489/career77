@@ -1,5 +1,13 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 
+export interface IResume {
+  url: string;
+  publicId: string;
+  filename: string;
+  isPrimary: boolean;
+  uploadedAt: Date;
+}
+
 export interface ICandidate extends Document {
   userId?: mongoose.Types.ObjectId;
   name: string;
@@ -10,12 +18,19 @@ export interface ICandidate extends Document {
   skills: string[];
   lookingFor?: string;
   bio?: string;
-  resumeUrl?: string;
-  resumePublicId?: string;
+  resumes: IResume[];
   savedJobs?: mongoose.Types.ObjectId[];
   createdAt: Date;
   updatedAt: Date;
 }
+
+const ResumeSchema = new Schema<IResume>({
+  url: { type: String, required: true },
+  publicId: { type: String, required: true },
+  filename: { type: String, required: true },
+  isPrimary: { type: Boolean, default: false },
+  uploadedAt: { type: Date, default: Date.now },
+});
 
 const CandidateSchema = new Schema<ICandidate>(
   {
@@ -28,8 +43,14 @@ const CandidateSchema = new Schema<ICandidate>(
     skills: [{ type: String }],
     lookingFor: { type: String },
     bio: { type: String },
-    resumeUrl: { type: String },
-    resumePublicId: { type: String },
+    resumes: {
+      type: [ResumeSchema],
+      validate: [
+        (val: IResume[]) => val.length <= 3,
+        '{PATH} exceeds the limit of 3 resumes'
+      ],
+      default: []
+    },
     savedJobs: [{ type: Schema.Types.ObjectId, ref: "Job", default: [] }],
   },
   { timestamps: true }
