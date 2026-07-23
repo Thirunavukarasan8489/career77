@@ -16,8 +16,7 @@ import { SupportTicket } from "../models/SupportTicket";
 import { Notification } from "../models/Notification";
 
 const MONGODB_URI =
-  process.env.MONGODB_URI ||
-  "mongodb+srv://thirugopi733_db_user:RYy9xP7TsOM5YMVN@cluster0.u8qrocd.mongodb.net/career77";
+  process.env.MONGODB_URI || "mongodb://localhost:27017/career77";
 
 function slugify(text: string): string {
   return text
