@@ -42,22 +42,22 @@ export default function AdminSupportPage() {
   };
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl space-y-6">
-      <div className="border-b border-slate-800 pb-5">
-        <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-white">
+    <div className="bg-white border border-slate-200/80 rounded-2xl p-6 sm:p-8 shadow-xs space-y-6">
+      <div className="border-b border-slate-100 pb-5">
+        <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-slate-900">
           Support Ticketing Desk
         </h1>
-        <p className="text-slate-400 text-sm mt-1">
+        <p className="text-slate-500 text-sm mt-1">
           Review and resolve candidate and recruiter support inquiries.
         </p>
       </div>
 
       {loading ? (
         <div className="flex justify-center py-12">
-          <div className="w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+          <div className="w-8 h-8 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin"></div>
         </div>
       ) : tickets.length === 0 ? (
-        <div className="bg-slate-950 border border-slate-800 rounded-xl p-10 text-center text-slate-400 text-sm">
+        <div className="bg-slate-50 border border-slate-200/80 rounded-xl p-10 text-center text-slate-500 text-sm">
           No open support tickets.
         </div>
       ) : (
@@ -65,23 +65,23 @@ export default function AdminSupportPage() {
           {tickets.map((t) => (
             <div
               key={t._id}
-              className="bg-slate-950 border border-slate-800 rounded-xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+              className="bg-slate-50 border border-slate-200/80 rounded-xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-purple-200 transition-colors"
             >
               <div>
                 <div className="flex items-center gap-2 mb-1">
                   <span
-                    className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
+                    className={`text-xs font-bold px-2.5 py-0.5 rounded-full ${
                       t.status === "resolved"
-                        ? "bg-emerald-900/60 text-emerald-300"
-                        : "bg-amber-900/60 text-amber-300"
+                        ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                        : "bg-amber-50 text-amber-700 border border-amber-200"
                     }`}
                   >
                     {t.status.toUpperCase()}
                   </span>
-                  <h3 className="font-bold text-white text-base">{t.subject}</h3>
+                  <h3 className="font-bold text-slate-900 text-base">{t.subject}</h3>
                 </div>
-                <p className="text-xs text-slate-400 mt-1">{t.message}</p>
-                <p className="text-[11px] text-slate-500 mt-1">
+                <p className="text-xs text-slate-600 mt-1">{t.message}</p>
+                <p className="text-[11px] text-slate-400 mt-1">
                   Raised on {new Date(t.createdAt).toLocaleString()}
                 </p>
               </div>
@@ -89,7 +89,7 @@ export default function AdminSupportPage() {
               {t.status !== "resolved" && (
                 <button
                   onClick={() => resolveTicket(t._id)}
-                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-lg transition-colors shadow-sm"
+                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg transition-colors shadow-sm"
                 >
                   Mark Resolved
                 </button>

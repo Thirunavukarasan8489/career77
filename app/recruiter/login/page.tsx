@@ -9,8 +9,8 @@ import Link from "next/link";
 export default function RecruiterLoginPage() {
   const { data: session } = useSession();
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("recruiter@company.com");
+  const [password, setPassword] = useState("password123");
   const [showPassword, setShowPassword] = useState(false);
   const [keepSigned, setKeepSigned] = useState(true);
   const [loading, setLoading] = useState(false);

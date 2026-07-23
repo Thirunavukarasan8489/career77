@@ -57,51 +57,51 @@ export default function AdminCmsPage() {
   };
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl space-y-6">
-      <div className="border-b border-slate-800 pb-5">
-        <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-white">
+    <div className="bg-white border border-slate-200/80 rounded-2xl p-6 sm:p-8 shadow-xs space-y-6">
+      <div className="border-b border-slate-100 pb-5">
+        <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-slate-900">
           Marketing CMS Content Editor
         </h1>
-        <p className="text-slate-400 text-sm mt-1">
+        <p className="text-slate-500 text-sm mt-1">
           Edit landing page headline copy, announcement bar text, and marketing banners live.
         </p>
       </div>
 
       <form onSubmit={handleSave} className="space-y-6">
         <div>
-          <label className="block text-xs font-semibold uppercase text-slate-300 mb-1">Top Announcement Banner</label>
+          <label className="block text-xs font-semibold uppercase text-slate-700 mb-1.5">Top Announcement Banner</label>
           <input
             type="text"
             value={announcement}
             onChange={(e) => setAnnouncement(e.target.value)}
-            className="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
           />
         </div>
 
         <div>
-          <label className="block text-xs font-semibold uppercase text-slate-300 mb-1">Hero Main Title</label>
+          <label className="block text-xs font-semibold uppercase text-slate-700 mb-1.5">Hero Main Title</label>
           <input
             type="text"
             value={heroTitle}
             onChange={(e) => setHeroTitle(e.target.value)}
-            className="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
           />
         </div>
 
         <div>
-          <label className="block text-xs font-semibold uppercase text-slate-300 mb-1">Hero Subtitle</label>
+          <label className="block text-xs font-semibold uppercase text-slate-700 mb-1.5">Hero Subtitle</label>
           <textarea
             rows={3}
             value={heroSubtitle}
             onChange={(e) => setHeroSubtitle(e.target.value)}
-            className="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
           />
         </div>
 
         <button
           type="submit"
           disabled={saving}
-          className="px-6 py-3 bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-purple-600/30 transition-all disabled:opacity-50"
+          className="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs rounded-xl shadow-md transition-all disabled:opacity-50"
         >
           {saving ? "Publishing..." : "Publish Content Changes"}
         </button>

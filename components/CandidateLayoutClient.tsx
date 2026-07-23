@@ -384,7 +384,7 @@ export default function CandidateLayoutClient({ children }: CandidateLayoutClien
           </main>
 
           {/* Page Footer */}
-          <footer className="border-t border-slate-200/80 bg-white py-5 px-6 sm:px-8 text-xs text-slate-400 flex flex-col sm:flex-row items-center justify-between gap-4">
+          {/* <footer className="border-t border-slate-200/80 bg-white py-5 px-6 sm:px-8 text-xs text-slate-400 flex flex-col sm:flex-row items-center justify-between gap-4">
             <p>© 2026 Career77. All rights reserved.</p>
             <div className="flex items-center gap-4">
               <a href="#" className="hover:text-slate-600 transition-colors">Privacy Policy</a>
@@ -393,7 +393,7 @@ export default function CandidateLayoutClient({ children }: CandidateLayoutClien
               <span>•</span>
               <a href="#" className="hover:text-slate-600 transition-colors">Candidate Support</a>
             </div>
-          </footer>
+          </footer> */}
         </div>
       </div>
     </div>

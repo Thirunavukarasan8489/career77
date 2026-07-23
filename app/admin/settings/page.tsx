@@ -13,22 +13,22 @@ export default function AdminSettingsPage() {
   };
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl space-y-6">
-      <div className="border-b border-slate-800 pb-5">
-        <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-white">
+    <div className="bg-white border border-slate-200/80 rounded-2xl p-6 sm:p-8 shadow-xs space-y-6">
+      <div className="border-b border-slate-100 pb-5">
+        <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-slate-900">
           System & Platform Settings
         </h1>
-        <p className="text-slate-400 text-sm mt-1">
+        <p className="text-slate-500 text-sm mt-1">
           Global application environment variables, maintenance toggles, and security configuration.
         </p>
       </div>
 
       <form onSubmit={handleSave} className="space-y-6">
         <div className="space-y-4">
-          <div className="flex items-center justify-between p-4 bg-slate-950 rounded-xl border border-slate-800">
+          <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200/80">
             <div>
-              <h4 className="font-bold text-white text-sm">Platform Maintenance Mode</h4>
-              <p className="text-xs text-slate-400">Temporarily restrict candidate application submissions</p>
+              <h4 className="font-bold text-slate-900 text-sm">Platform Maintenance Mode</h4>
+              <p className="text-xs text-slate-500">Temporarily restrict candidate application submissions</p>
             </div>
             <input
               type="checkbox"
@@ -38,10 +38,10 @@ export default function AdminSettingsPage() {
             />
           </div>
 
-          <div className="flex items-center justify-between p-4 bg-slate-950 rounded-xl border border-slate-800">
+          <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200/80">
             <div>
-              <h4 className="font-bold text-white text-sm">Auto-Approve Enterprise Domains</h4>
-              <p className="text-xs text-slate-400">Automatically grant Verified status to recognized recruiter domains</p>
+              <h4 className="font-bold text-slate-900 text-sm">Auto-Approve Enterprise Domains</h4>
+              <p className="text-xs text-slate-500">Automatically grant Verified status to recognized recruiter domains</p>
             </div>
             <input
               type="checkbox"
@@ -52,10 +52,10 @@ export default function AdminSettingsPage() {
           </div>
         </div>
 
-        <div className="pt-4 border-t border-slate-800 flex justify-end">
+        <div className="pt-4 border-t border-slate-100 flex justify-end">
           <button
             type="submit"
-            className="px-6 py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs rounded-xl shadow-lg transition-all"
+            className="px-6 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs rounded-xl shadow-md transition-all"
           >
             Save System Configuration
           </button>

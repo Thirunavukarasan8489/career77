@@ -9,7 +9,7 @@ import Link from "next/link";
 export default function CandidateLoginPage() {
   const { loginCandidate } = useApp();
   const router = useRouter();
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState("candidate@example.com");
   const [otpSent, setOtpSent] = useState(false);
   const [loginOtp, setLoginOtp] = useState("");
   const [submittingLogin, setSubmittingLogin] = useState(false);
