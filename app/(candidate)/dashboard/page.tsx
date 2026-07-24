@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useApp } from "@/context/AppContext";
-import { showToast } from "@/components/Toast";
+import { showToast } from "@/components/common/Toast";
 
 export default function CandidateDashboardPage() {
   const { candidate } = useApp();

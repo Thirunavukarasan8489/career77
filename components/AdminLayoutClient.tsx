@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
-import { showToast } from "@/components/Toast";
+import { showToast } from "@/components/common/Toast";
 
 interface AdminLayoutClientProps {
   children: React.ReactNode;
