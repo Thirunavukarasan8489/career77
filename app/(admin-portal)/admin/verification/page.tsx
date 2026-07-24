@@ -43,22 +43,22 @@ export default function AdminVerificationPage() {
   };
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl space-y-6">
-      <div className="border-b border-slate-800 pb-5">
-        <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-white">
+    <div className="bg-white border border-slate-200/80 rounded-2xl p-6 sm:p-8 shadow-xs space-y-6">
+      <div className="border-b border-slate-100 pb-5">
+        <h1 className="font-display font-extrabold text-2xl text-slate-900">
           Verification Review Queue
         </h1>
-        <p className="text-slate-400 text-sm mt-1">
+        <p className="text-slate-500 text-xs sm:text-sm mt-1">
           Review business registration documents submitted by recruiters to issue Verified badges.
         </p>
       </div>
 
       {loading ? (
         <div className="flex justify-center py-12">
-          <div className="w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+          <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
         </div>
       ) : requests.length === 0 ? (
-        <div className="bg-slate-950 border border-slate-800 rounded-xl p-10 text-center text-slate-400 text-sm">
+        <div className="bg-slate-50 border border-slate-200/80 rounded-xl p-10 text-center text-slate-500 text-sm font-medium">
           No pending verification requests in queue.
         </div>
       ) : (
@@ -66,26 +66,26 @@ export default function AdminVerificationPage() {
           {requests.map((req) => (
             <div
               key={req._id}
-              className="bg-slate-950 border border-slate-800 rounded-xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+              className="bg-slate-50/70 border border-slate-200/80 rounded-xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-slate-300 transition-all"
             >
               <div>
                 <div className="flex items-center gap-2 mb-1">
                   <span
-                    className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
+                    className={`text-[11px] font-extrabold px-2.5 py-0.5 rounded-full ${
                       req.status === "approved"
-                        ? "bg-emerald-900/60 text-emerald-300"
+                        ? "bg-emerald-100 text-emerald-800 border border-emerald-200"
                         : req.status === "rejected"
-                        ? "bg-rose-900/60 text-rose-300"
-                        : "bg-amber-900/60 text-amber-300"
+                        ? "bg-rose-100 text-rose-800 border border-rose-200"
+                        : "bg-amber-100 text-amber-800 border border-amber-200"
                     }`}
                   >
                     {req.status.toUpperCase()}
                   </span>
-                  <h3 className="font-bold text-white text-base">
+                  <h3 className="font-bold text-slate-900 text-base">
                     Company: {req.companyId?.name || "Company"}
                   </h3>
                 </div>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-slate-500 font-medium">
                   Submitted: {new Date(req.submittedAt).toLocaleString()}
                 </p>
                 {req.documentUrl && (
@@ -93,7 +93,7 @@ export default function AdminVerificationPage() {
                     href={req.documentUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-block mt-2 text-xs font-semibold text-purple-400 hover:text-purple-300"
+                    className="inline-block mt-2 text-xs font-bold text-purple-600 hover:text-purple-700"
                   >
                     View Uploaded Verification Document ↗
                   </a>
@@ -104,13 +104,13 @@ export default function AdminVerificationPage() {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => handleReview(req._id, "approved")}
-                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-lg transition-colors shadow-sm"
+                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition-colors shadow-xs"
                   >
                     Approve & Verify
                   </button>
                   <button
                     onClick={() => handleReview(req._id, "rejected")}
-                    className="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold rounded-lg transition-colors shadow-sm"
+                    className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl transition-colors shadow-xs"
                   >
                     Reject
                   </button>

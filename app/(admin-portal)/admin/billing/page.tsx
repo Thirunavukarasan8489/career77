@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { showToast } from "@/components/common/Toast";
 
 export default function AdminBillingPage() {
   const plans = [
@@ -10,22 +10,30 @@ export default function AdminBillingPage() {
   ];
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl space-y-8">
-      <div className="border-b border-slate-800 pb-5">
-        <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-white">
-          Billing & Subscription Management
-        </h1>
-        <p className="text-slate-400 text-sm mt-1">
-          Monitor company subscription tiers, invoice statuses, and payment gateway webhooks.
-        </p>
+    <div className="bg-white border border-slate-200/80 rounded-2xl p-6 sm:p-8 shadow-xs space-y-8">
+      <div className="border-b border-slate-100 pb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="font-display font-extrabold text-2xl text-slate-900">
+            Billing & Subscription Management
+          </h1>
+          <p className="text-slate-500 text-xs sm:text-sm mt-1">
+            Monitor company subscription tiers, invoice statuses, and payment gateway webhooks.
+          </p>
+        </div>
+        <button
+          onClick={() => showToast("Opening payment gateway logs...")}
+          className="bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-xs transition-colors shrink-0"
+        >
+          Payment Gateway Logs
+        </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         {plans.map((p) => (
-          <div key={p.name} className="bg-slate-950 border border-slate-800 rounded-xl p-6 space-y-4">
-            <h3 className="font-bold text-white text-lg">{p.name}</h3>
-            <p className="text-2xl font-extrabold text-purple-400">{p.price}</p>
-            <div className="text-xs text-slate-400 space-y-1">
+          <div key={p.name} className="bg-slate-50/70 border border-slate-200/80 rounded-xl p-6 space-y-4 hover:border-slate-300 transition-all">
+            <h3 className="font-bold text-slate-900 text-lg">{p.name}</h3>
+            <p className="text-2xl font-extrabold text-purple-600">{p.price}</p>
+            <div className="text-xs text-slate-600 font-medium space-y-1">
               <p>• {p.jobs}</p>
               <p>• {p.support}</p>
             </div>
