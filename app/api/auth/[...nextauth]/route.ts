@@ -26,23 +26,44 @@ export const authOptions: NextAuthOptions = {
         if (user && user.password) {
           const isValid = await bcrypt.compare(credentials.password, user.password);
           if (isValid) {
+            let name = user.email.split("@")[0];
+            if (user.role === "recruiter") {
+              const recruiterDoc = await Recruiter.findOne({ userId: user._id });
+              if (recruiterDoc) {
+                name = recruiterDoc.companyName || "Recruiter";
+              }
+            } else if (user.role === "candidate") {
+              const { Candidate } = await import("@/models/Candidate");
+              const candidateDoc = await Candidate.findOne({ userId: user._id });
+              if (candidateDoc && candidateDoc.name) {
+                name = candidateDoc.name;
+              }
+            }
             return {
               id: user._id.toString(),
               email: user.email,
-              name: user.email.split("@")[0],
+              name,
               role: user.role,
             };
           }
         }
 
-        // 2. Fallback check for Recruiter model legacy entries
+        // 2. Fallback check & auto-migration for Recruiter model legacy entries
         const recruiter = await Recruiter.findOne({ email: emailLower });
         if (recruiter && recruiter.password) {
           const isValid = await bcrypt.compare(credentials.password, recruiter.password);
           if (isValid) {
-            return {
-              id: recruiter._id.toString(),
+            const newUser = await User.create({
               email: recruiter.email,
+              password: recruiter.password,
+              role: "recruiter",
+            });
+            recruiter.userId = newUser._id;
+            await recruiter.save();
+
+            return {
+              id: newUser._id.toString(),
+              email: newUser.email,
               name: recruiter.companyName || "Recruiter",
               role: "recruiter",
             };
@@ -67,12 +88,26 @@ export const authOptions: NextAuthOptions = {
         token.name = user.name;
         token.role = (user as any).role || "candidate";
       }
+      if (token.role === "recruiter" && token.id) {
+        try {
+          await connectToDatabase();
+          const recDoc = await Recruiter.findOne({ userId: token.id }).populate("companyId");
+          if (recDoc && recDoc.companyId) {
+            token.companyVerified = (recDoc.companyId as any).verified || false;
+          } else {
+            token.companyVerified = false;
+          }
+        } catch {
+          token.companyVerified = false;
+        }
+      }
       return token;
     },
     async session({ session, token }) {
       if (token && session.user) {
         (session.user as any).id = token.id;
         (session.user as any).role = token.role;
+        (session.user as any).companyVerified = token.companyVerified || false;
         session.user.name = token.name;
       }
       return session;

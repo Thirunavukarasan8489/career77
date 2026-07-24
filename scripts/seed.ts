@@ -55,7 +55,7 @@ async function seed() {
   const recruiterPass = await bcrypt.hash("password123", 10);
   const candidatePass = await bcrypt.hash("password123", 10);
 
-  const adminUser = await User.create({
+  const _adminUser = await User.create({
     email: "admin@career77.com",
     password: superadminPass,
     role: "superadmin",

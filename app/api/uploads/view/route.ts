@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+// NextResponse not used — this route streams files via native Response
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);

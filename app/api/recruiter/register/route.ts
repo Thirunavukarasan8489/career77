@@ -1,47 +1,22 @@
 import { NextResponse } from "next/server";
-import { connectToDatabase } from "@/lib/db";
-import { Recruiter } from "@/models/Recruiter";
-import bcrypt from "bcryptjs";
+import { AuthService } from "@/server/services/auth.service";
+
+const authService = new AuthService();
 
 export async function POST(request: Request) {
   try {
-    await connectToDatabase();
     const body = await request.json().catch(() => ({}));
-    const { email, password, companyName } = body;
-
-    if (!email || !password || !companyName) {
-      return NextResponse.json(
-        { error: "Email, password, and company name are required fields" },
-        { status: 400 }
-      );
-    }
-
-    const existingRecruiter = await Recruiter.findOne({ email: email.toLowerCase().trim() });
-    if (existingRecruiter) {
-      return NextResponse.json(
-        { error: "A recruiter with this email is already registered" },
-        { status: 400 }
-      );
-    }
-
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password.trim(), 10);
-
-    const recruiter = await Recruiter.create({
-      email: email.toLowerCase().trim(),
-      password: hashedPassword,
-      companyName: companyName.trim(),
-    });
+    
+    const recruiterData = await authService.registerRecruiter(body);
 
     return NextResponse.json({
       success: true,
-      recruiter: {
-        id: recruiter._id.toString(),
-        email: recruiter.email,
-        companyName: recruiter.companyName,
-      },
+      recruiter: recruiterData,
     });
   } catch (error: any) {
+    if (error.message.includes("required") || error.message.includes("registered")) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
     return NextResponse.json(
       { error: error.message || "Failed to register recruiter" },
       { status: 500 }

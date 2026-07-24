@@ -18,7 +18,7 @@ export async function POST(request: Request) {
       ? skills
       : [];
 
-    const isFresher =
+    const _isFresher =
       !exp ||
       exp.toLowerCase() === "fresher" ||
       exp.toLowerCase().includes("fresh");
